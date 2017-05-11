@@ -1,5 +1,5 @@
 require! d3
-require! 'prelude-ls': {map, each, zip-with, concat-map, apply, take}
+require! 'prelude-ls': {flip, map, each, zip-with, concat-map, apply, take}
 
 require! './complex.js': Complex
 require! './numeric.js': Numeric
@@ -14,31 +14,31 @@ raise \d3
 /*------------------
 Handling draggables
 ------------------*/
-each do
-	(element) ->
-		[x-diff, y-diff, x-lim, y-lim] = [0, 0, 0, 0]
-		mousemove = (event) !->
-			element.style.left = (0 >? event.client-x - x-diff <? x-lim) + \px
-			element.style.top  = (0 >? event.client-y - y-diff <? y-lim) + \px
+(flip each) (document.get-elements-by-class-name \draggable), (element) ->
+	[target, x-diff, y-diff, x-lim, y-lim] = [null, 0, 0, 0, 0]
 
-		element.add-event-listener \mousedown, (event) !->
-			[element-style, parent-style] = map do
-				get-computed-style
-				[element, element.parent-element]
-			[x-diff, y-diff] :=
-				(parse-int event.client-x) - (parse-int element-style.left)
-				(parse-int event.client-y) - (parse-int element-style.top)
-			[x-lim, y-lim] :=
-				(parse-int parent-style.width) - (parse-int element-style.width)
-				(parse-int parent-style.height) - (parse-int element-style.height)
-			element.style.cursor = \move
-			document.add-event-listener \mousemove, mousemove
+	mousemove = (event) !->
+		target.style.left = (0 >? event.client-x - x-diff <? x-lim) + \px
+		target.style.top  = (0 >? event.client-y - y-diff <? y-lim) + \px
 
-		element.add-event-listener \mouseup, (event) !->
-			element.style.cursor = \default
-			document.remove-event-listener \mousemove, mousemove
+	element.add-event-listener \mousedown, (event) !->
+		target := if element.dragtarget?
+			then element.dragtarget else element
+		[target-style, parent-style] = map do
+			get-computed-style
+			[target, target.parent-element]
+		[x-diff, y-diff] :=
+			(parse-int event.client-x) - (parse-int target-style.left)
+			(parse-int event.client-y) - (parse-int target-style.top)
+		[x-lim, y-lim] :=
+			(parse-int parent-style.width) - (parse-int target-style.width)
+			(parse-int parent-style.height) - (parse-int target-style.height)
+		target.style.cursor = \move
+		document.add-event-listener \mousemove, mousemove
 
-	document.get-elements-by-class-name \draggable
+	element.add-event-listener \mouseup, (event) !->
+		target.style.cursor = \default
+		document.remove-event-listener \mousemove, mousemove
 
 /*------------------
 Frequency response config
