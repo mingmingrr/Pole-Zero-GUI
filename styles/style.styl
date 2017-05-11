@@ -6,21 +6,22 @@ body
 	user-select: none
 
 .scalable
-	min-width  : 8px
-	min-height : 8px
+	corner-size = 10px
+	min-width  : corner-size
+	min-height : corner-size
 
-.scalable-corner
-	width    : 0
-	height   : 0
-	position : absolute
-	bottom   : 0
-	right    : 0
-	cursor   : se-resize
-	box-sizing: border-box
-	user-select  : none
-	border-style : solid
-	border-width : 0 0 8px 8px
-	border-color : transparent transparent hsla(0, 0, 50%, 0.5) transparent
+	.scalable-corner
+		width    : 0
+		height   : 0
+		position : absolute
+		bottom   : 0
+		right    : 0
+		cursor   : se-resize
+		box-sizing: border-box
+		user-select  : none
+		border-style : solid
+		border-width : 0 0 corner-size corner-size
+		border-color : transparent transparent hsla(0, 0, 50%, 0.5) transparent
 
 #options
 	position : absolute
