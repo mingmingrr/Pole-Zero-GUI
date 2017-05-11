@@ -27,9 +27,9 @@ Handling draggables
 		[target-style, parent-style] = map do
 			get-computed-style
 			[target, target.parent-element]
-		[x-diff, y-diff] := # TODO use offset-x and offset-y
-			(parse-int event.client-x) - (parse-int target-style.left)
-			(parse-int event.client-y) - (parse-int target-style.top)
+		[x-diff, y-diff] :=
+			parse-int event.layer-x
+			parse-int event.layer-y
 		[x-lim, y-lim] :=
 			(parse-int parent-style.width) - (parse-int target-style.width)
 			(parse-int parent-style.height) - (parse-int target-style.height)
