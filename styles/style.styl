@@ -1,0 +1,42 @@
+body
+	margin   : 0
+	overflow : hidden
+
+.draggable
+	user-select: none
+
+#options
+	background-color : hsla(0, 100%, 50%, 0.5)
+	position : absolute
+	left     : 0
+	top      : 0
+	height   : 100px
+	width    : 100px
+
+#response
+	padding-top    : 20px
+	padding-bottom : 30px
+	padding-left   : 50px
+	padding-right  : 20px
+	height : 'calc(100vh - %s - %s)' % (@padding-top @padding-bottom)
+	width  : 'calc(100vw - %s - %s)' % (@padding-left @padding-right)
+
+	// g.plot
+		// transform: translate(@padding-left, @padding-top)
+
+	g.x-axis
+		transform: 'translate(0, %s)' % (@height)
+
+	// g.y-axis
+
+	// g.x-label
+
+	// g.y-label
+
+	path.line
+		fill   : none
+		stroke : steelblue
+		stroke-linejoin : round
+		stroke-linecap  : butt
+		stroke-width    : 1.5
+

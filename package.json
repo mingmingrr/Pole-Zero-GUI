@@ -1,0 +1,23 @@
+{
+  "name": "pole-zero-gui",
+  "version": "0.1.0",
+  "description": "A GUI for creating disctrete-time FIR filters based on poles and zeros. Inspired by the MatLab PoleZeroPlace3D GUI from the SPFirst toolbox.",
+  "main": "index.js",
+  "scripts": {
+    "test": "make test"
+  },
+  "author": "mingmingrr",
+  "license": "MIT",
+  "devDependencies": {
+    "chai": "^3.5.0",
+    "chai-deep-closeto": "^0.1.1",
+    "livescript": "^1.5.0",
+    "mocha": "^3.2.0",
+    "pug": "^2.0.0-beta.12",
+    "stylus": "^0.54.5",
+    "webpack": "^2.4.1"
+  },
+  "dependencies": {
+    "d3": "^4.8.0"
+  }
+}

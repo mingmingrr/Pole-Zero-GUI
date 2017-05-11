@@ -1,0 +1,11 @@
+# Logs
+*.log
+npm-debug.log*
+
+# Built files
+*.html
+*.css
+*.js
+
+# Node dependencies
+node_modules/
