@@ -5,13 +5,30 @@ body
 .draggable
 	user-select: none
 
+.scalable
+	min-width  : 8px
+	min-height : 8px
+
+.scalable-corner
+	width    : 0
+	height   : 0
+	position : absolute
+	bottom   : 0
+	right    : 0
+	cursor   : se-resize
+	box-sizing: border-box
+	user-select  : none
+	border-style : solid
+	border-width : 0 0 8px 8px
+	border-color : transparent transparent hsla(0, 0, 50%, 0.5) transparent
+
 #options
-	background-color : hsla(0, 100%, 50%, 0.5)
 	position : absolute
 	left     : 0
 	top      : 0
 	height   : 100px
 	width    : 100px
+	background-color : hsla(0, 100%, 50%, 0.5)
 
 #response
 	padding-top    : 20px

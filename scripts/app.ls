@@ -27,17 +27,52 @@ Handling draggables
 		[target-style, parent-style] = map do
 			get-computed-style
 			[target, target.parent-element]
-		[x-diff, y-diff] :=
+		[x-diff, y-diff] := # TODO use offset-x and offset-y
 			(parse-int event.client-x) - (parse-int target-style.left)
 			(parse-int event.client-y) - (parse-int target-style.top)
 		[x-lim, y-lim] :=
 			(parse-int parent-style.width) - (parse-int target-style.width)
 			(parse-int parent-style.height) - (parse-int target-style.height)
-		target.style.cursor = \move
+		element.style.cursor = \move
 		document.add-event-listener \mousemove, mousemove
 
 	element.add-event-listener \mouseup, (event) !->
-		target.style.cursor = \default
+		element.style.cursor = \default
+		document.remove-event-listener \mousemove, mousemove
+
+/*------------------
+Handling scalables
+------------------*/
+(flip each) (document.get-elements-by-class-name \scalable), (element) ->
+	corner = document.create-element \div
+	corner.class-list.add \scalable-corner
+	element.append-child corner
+
+	[x-diff, y-diff, x-lim, y-lim] = [0, 0, 0, 0]
+
+	mousemove = (event) !->
+		[x, y] =
+			(0 >? event.client-x - x-diff <? x-lim)
+			(0 >? event.client-y - y-diff <? y-lim)
+		element.style.width  = x + \px
+		element.style.height = y + \px
+
+	corner.add-event-listener \mousedown, (event) !->
+		event.stop-propagation!
+		[corner-rect, element-rect, parent-rect] = map do
+			(.get-bounding-client-rect!)
+			[corner, element, element.parent-element]
+		[x-diff, y-diff] :=
+			(parse-int element-rect.left) - (parse-int parent-rect.left) - do
+				(parse-int corner-rect.width) - (parse-int event.layer-x)
+			(parse-int element-rect.top) - (parse-int parent-rect.top) - do
+				(parse-int corner-rect.height) - (parse-int event.layer-y)
+		[x-lim, y-lim] :=
+			(parse-int parent-rect.width) - (parse-int element-rect.left)
+			(parse-int parent-rect.height) - (parse-int element-rect.top)
+		document.add-event-listener \mousemove, mousemove
+
+	corner.add-event-listener \mouseup, (event) !->
 		document.remove-event-listener \mousemove, mousemove
 
 /*------------------
