@@ -1,6 +1,8 @@
 lssrc = $(shell find scripts/ -type f -name '*.ls')
 jsobj = $(lssrc:.ls=.js)
+
 packobj = app.js vendor.js
+packflag = -d
 
 csssrc = $(shell find styles/ -type f -name '*.styl')
 cssobj = $(csssrc:.styl=.css)
@@ -14,6 +16,8 @@ testobj = $(testsrc:.ls=.js)
 confsrc = $(shell find . -maxdepth 1 -type f -name '*.ls')
 confobj = $(confsrc:.ls=.js)
 
+releasedir = release/
+
 .PHONY: all
 all: compile pack
 
@@ -25,7 +29,16 @@ config: $(confobj)
 
 .PHONY: pack
 pack: compile config
-	webpack
+	webpack --progress $(packflag)
+
+.PHONY: release
+release: packflag = -p
+release: all
+	echo $(packflag)
+	mkdir $(releasedir)
+	cp --parents $(packobj) $(cssobj) $(htmlobj) $(releasedir)
+	cd $(releasedir); zip -r9 ../release.zip *
+	cd $(releasedir); tar -zcvf ../release.tar.gz *
 
 $(packobj): compile config
 	webpack
@@ -51,4 +64,6 @@ clean:
 	@rm -vf $(htmlobj)
 	@rm -vf $(confobj)
 	@rm -vf $(packobj)
+	@rm -vfr $(releasedir)
+	@rm -vf release.zip release.tar.gz
 
