@@ -29,8 +29,8 @@ scales =
 
 graph =
 	svg : d3 .select \svg
-	x   : d3 .scale-linear! .domain [0, Math.PI / 2]
-	xi  : (* (Math.PI / config.resolution))
+	x   : d3 .scale-linear! .domain [0, Math.PI]
+	xi  : (* (2 * Math.PI / config.resolution))
 	y   : null
 Object.assign graph, do
 	g : graph.svg .append \g .classed \plot, true
