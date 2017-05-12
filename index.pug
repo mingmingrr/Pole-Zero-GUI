@@ -6,7 +6,12 @@ link(rel='stylesheet' href='styles/style.css')
 script(type='text/javascript' src='vendor.js')
 
 svg#response
-#options.draggable.scalable hello!
+#options.scalable
+	.flex-container.draggable.bar(dragtarget='#options')
+		.flex-item.clickable.icon.triangle-left
+		.flex-item.bold Bar text
+		.flex-item.clickable.icon.triangle-right
+	| Hello!
 
 script(type='text/javascript' src='app.js')
 

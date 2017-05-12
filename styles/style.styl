@@ -1,35 +1,69 @@
+@import './triangle.styl'
+
+color0 = #fff
+color1 = #ddd
+color2 = #666
+color3 = #000
+
+.clickable
+	cursor : pointer
+
+.icon.triangle-left
+	triangle-generator(10px, 10px, color2, 'w')
+
+.icon.triangle-right
+	triangle-generator(10px, 10px, color2, 'e')
+
+.flex-container
+	display : flex
+	justify-content : space-between
+
+.flex-item
+	margin-top    : auto
+	margin-bottom : auto
+
+.bold
+	font-weight : bold
+
 body
 	margin   : 0
 	overflow : hidden
 
 .draggable
-	user-select: none
+	user-select : none
+
+.bar
+	width : 100%
 
 .scalable
-	corner-size = 10px
+	corner-size = 8px
 	min-width  : corner-size
 	min-height : corner-size
 
 	.scalable-corner
-		width    : 0
-		height   : 0
+		triangle-generator(corner-size, corner-size, color2, 'se')
 		position : absolute
 		bottom   : 0
 		right    : 0
 		cursor   : se-resize
-		box-sizing: border-box
-		user-select  : none
-		border-style : solid
-		border-width : 0 0 corner-size corner-size
-		border-color : transparent transparent hsla(0, 0, 50%, 0.5) transparent
+		user-select : none
 
 #options
 	position : absolute
 	left     : 0
 	top      : 0
-	height   : 100px
-	width    : 100px
-	background-color : hsla(0, 100%, 50%, 0.5)
+	height   : 200px
+	width    : 200px
+	min-height       : 100px
+	min-width        : 100px
+	border-width     : 1px
+	border-style     : solid
+	background-color : hsla(0, 0, 100%, 0.8)
+
+	.draggable.bar
+		background-color : color1
+		border-bottom-width : inherit
+		border-bottom-style : inherit
 
 #response
 	padding-top    : 20px
@@ -43,7 +77,7 @@ body
 		// transform: translate(@padding-left, @padding-top)
 
 	g.x-axis
-		transform: 'translate(0, %s)' % (@height)
+		transform: 'translateY(%s)' % (@height)
 
 	// g.y-axis
 
