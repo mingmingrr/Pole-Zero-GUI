@@ -26,5 +26,5 @@ require! 'prelude-ls': {flip, each, map}
 			(parse-int parent-rect.height) - (parse-int element-rect.top)
 		document.add-event-listener \mousemove, mousemove
 
-	corner.add-event-listener \mouseup, (event) !->
+	document.add-event-listener \mouseup, (event) !->
 		document.remove-event-listener \mousemove, mousemove

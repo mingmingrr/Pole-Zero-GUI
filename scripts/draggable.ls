@@ -22,7 +22,7 @@ require! 'prelude-ls': {flip, each, map}
 		element.style.cursor = \move
 		document.add-event-listener \mousemove, mousemove
 
-	element.add-event-listener \mouseup, (event) !->
+	document.add-event-listener \mouseup, (event) !->
 		element.style.cursor = \default
 		document.remove-event-listener \mousemove, mousemove
 
