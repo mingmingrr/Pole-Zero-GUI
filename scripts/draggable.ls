@@ -8,14 +8,15 @@ require! 'prelude-ls': {flip, each, map}
 		target.style.top  = (0 >? event.client-y - y-diff <? y-lim) + \px
 
 	element.add-event-listener \mousedown, (event) !->
-		target := if element.dragtarget?
-			then element.dragtarget else element
+		target := if (element.get-attribute \dragtarget)?
+			then document.query-selector element.get-attribute \dragtarget
+			else element
 		[target-rect, parent-rect] = map do
 			(.get-bounding-client-rect!)
 			[target, target.parent-element]
 		[x-diff, y-diff] :=
-			parse-int event.layer-x
-			parse-int event.layer-y
+			(parse-int event.client-x) - (parse-int target-rect.left)
+			(parse-int event.client-y) - (parse-int target-rect.top)
 		[x-lim, y-lim] :=
 			(parse-int parent-rect.width) - (parse-int target-rect.width)
 			(parse-int parent-rect.height) - (parse-int target-rect.height)
