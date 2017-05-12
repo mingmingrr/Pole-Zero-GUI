@@ -1,0 +1,39 @@
+triangle-mixin(w-top, w-right, w-bot, w-left,
+		c-top, c-right, c-bot, c-left)
+	width  : 0
+	height : 0
+	box-sizing   : border-box
+	border-style : solid
+	border-width : w-top w-right w-bot w-left
+	border-color : c-top c-right c-bot c-left
+
+triangle-generator(width, height, color, direction)
+	half-width = 'calc(%s / 2)' % width
+	half-height = 'calc(%s / 2)' % height
+	if direction == 'n'
+		triangle-mixin(0, half-width, height, half-width,
+			transparent, transparent, color, transparent)
+	else if direction == 'e'
+		triangle-mixin(half-height, 0, half-height, width,
+			transparent, transparent, transparent, color)
+	else if direction == 's'
+		triangle-mixin(height, half-width, 0, half-width,
+			color, transparent, transparent, transparent)
+	else if direction == 'e'
+		triangle-mixin(half-height, width, half-height, 0,
+			transparent, color, transparent, transparent)
+	else if direction == 'ne'
+		triangle-mixin(0, width, height, 0,
+			transparent, color, transparent, transparent)
+	else if direction == 'se'
+		triangle-mixin(0, 0, height, width,
+			transparent, transparent, color, transparent)
+	else if direction == 'sw'
+		triangle-mixin(height, 0, 0, width,
+			transparent, transparent, transparent, color)
+	else if direction == 'nw'
+		triangle-mixin(height, width, 0, 0,
+			color, transparent, transparent, transparent)
+	else
+		1 / 0
+
