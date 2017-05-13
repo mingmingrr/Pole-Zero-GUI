@@ -16,14 +16,40 @@ color3 = #000
 
 .flex-container
 	display : flex
+	align-items : center
 	justify-content : space-between
 
-.flex-item
-	margin-top    : auto
-	margin-bottom : auto
+	.flex-grow
+		flex : 1
+
+.flex-container.flex-vertical
+	flex-direction : column
+
+.slide-container
+
+	.slide-item
+		display : none
+
+		.slide-title
+			display : none
+
+	.slide-item.active
+		display : block
+
+.divider-horizontal
+	width  : 100%
+	height : 0
+	border-bottom-style : solid
+	border-bottom-width : 1px
 
 .bold
 	font-weight : bold
+
+img
+	width  : auto
+	height : auto
+	max-width  : 100%
+	max-height : 100%
 
 body
 	margin   : 0
@@ -32,8 +58,11 @@ body
 .draggable
 	user-select : none
 
-.bar
+.fill-horizontal
 	width : 100%
+
+.fill-vertical
+	height : 100%
 
 .scalable
 	corner-size = 8px
@@ -48,30 +77,13 @@ body
 		cursor   : se-resize
 		user-select : none
 
-#options
-	position : absolute
-	left     : 0
-	top      : 0
-	height   : 200px
-	width    : 200px
-	min-height       : 100px
-	min-width        : 100px
-	border-width     : 1px
-	border-style     : solid
-	background-color : hsla(0, 0, 100%, 0.8)
-
-	.draggable.bar
-		background-color : color1
-		border-bottom-width : inherit
-		border-bottom-style : inherit
-
 #response
 	padding-top    : 20px
 	padding-bottom : 30px
 	padding-left   : 50px
 	padding-right  : 20px
-	height : 'calc(100vh - %s - %s)' % (@padding-top @padding-bottom)
 	width  : 'calc(100vw - %s - %s)' % (@padding-left @padding-right)
+	height : 'calc(100vh - %s - %s)' % (@padding-top @padding-bottom)
 
 	// g.plot
 		// transform: translate(@padding-left, @padding-top)
@@ -92,3 +104,22 @@ body
 		stroke-linecap  : butt
 		stroke-width    : 1.5
 
+#options
+	position : absolute
+	left     : 0
+	top      : 0
+	height   : 200px
+	width    : 200px
+	min-height       : 100px
+	min-width        : 100px
+	border-width     : 1px
+	border-style     : solid
+	background-color : hsla(0, 0, 100%, 0.8)
+
+	.draggable.fill-horizontal
+		background-color : color1
+		// border-bottom-width : inherit
+		// border-bottom-style : inherit
+
+	.slide-container
+		overflow-y : auto

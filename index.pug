@@ -6,12 +6,25 @@ link(rel='stylesheet' href='styles/style.css')
 script(type='text/javascript' src='vendor.js')
 
 svg#response
-#options.scalable
-	.flex-container.draggable.bar(dragtarget='#options')
-		.flex-item.clickable.icon.triangle-left
-		.flex-item.bold Bar text
-		.flex-item.clickable.icon.triangle-right
-	| Hello!
+#options.flex-container.flex-vertical.scalable
+	#bar.flex-container.draggable.fill-horizontal(dragtarget='#options')
+		.clickable.icon.triangle-left
+		.bold
+		.clickable.icon.triangle-right
+	.divider-horizontal
+	.flex-grow.fill-horizontal.slide-container(
+			prevtarget='#bar .clickable.icon.triangle-left'
+			nexttarget='#bar .clickable.icon.triangle-right'
+			titletarget='#bar .bold')
+		#poles.slide-item.active
+			.slide-title Poles
+			| Slide A
+		#zeros.slide-item
+			.slide-title Zeros
+			| Slide B
+		#darts.slide-item
+			.slide-title P/Z Plot
+			| Slide C
 
 script(type='text/javascript' src='app.js')
 

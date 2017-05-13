@@ -13,6 +13,7 @@ raise \d3
 
 require! './draggable.js'
 require! './scalable.js'
+require! './slide-container.js'
 
 /*------------------
 Frequency response config
