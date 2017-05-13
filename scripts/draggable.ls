@@ -4,6 +4,7 @@ require! 'prelude-ls': {flip, each, map}
 	[target, x-diff, y-diff, x-lim, y-lim] = [null, 0, 0, 0, 0]
 
 	mousemove = (event) !->
+		event.stop-propagation!
 		target.style.left = (0 >? event.client-x - x-diff <? x-lim) + \px
 		target.style.top  = (0 >? event.client-y - y-diff <? y-lim) + \px
 

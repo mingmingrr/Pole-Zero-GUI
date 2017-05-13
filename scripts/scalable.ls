@@ -8,6 +8,7 @@ require! 'prelude-ls': {flip, each, map}
 	[x-diff, y-diff, x-lim, y-lim] = [0, 0, 0, 0]
 
 	mousemove = (event) !->
+		event.stop-propagation!
 		element.style.width  = (0 >? event.client-x - x-diff <? x-lim) + \px
 		element.style.height = (0 >? event.client-y - y-diff <? y-lim) + \px
 
