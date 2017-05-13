@@ -35,7 +35,7 @@ pack: compile config
 release: packflag = -p
 release: all
 	echo $(packflag)
-	mkdir $(releasedir)
+	mkdir -p $(releasedir)
 	cp --parents $(packobj) $(cssobj) $(htmlobj) $(releasedir)
 	cd $(releasedir); zip -r9 ../release.zip *
 	cd $(releasedir); tar -zcvf ../release.tar.gz *
