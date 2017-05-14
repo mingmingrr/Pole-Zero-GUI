@@ -1,8 +1,8 @@
 require! 'prelude-ls': {zip, zipWith}
 
-export raise = (n, log=false) ->
-	window[n] = eval(n)
-	console.log eval(n) if log
+export raise = (key, value=eval(key), log=false) ->
+	window[key] = value
+	console.log value if log
 
 export trace = ->
 	console.log it
