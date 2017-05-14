@@ -7,6 +7,7 @@ require! 'prelude-ls': {flip, each, map}
 
 mousemove = (event) !->
 	event.stop-propagation!
+	window.get-selection!.remove-all-ranges!
 	target.style.left = (0 >? event.client-x - x-diff <? x-lim) + \px
 	target.style.top  = (0 >? event.client-y - y-diff <? y-lim) + \px
 

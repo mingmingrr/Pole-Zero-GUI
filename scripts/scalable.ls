@@ -11,6 +11,7 @@ element.append-child corner
 
 mousemove = (event) !->
 	event.stop-propagation!
+	window.get-selection!.remove-all-ranges!
 	element.style.width  = (0 >? event.client-x - x-diff <? x-lim) + \px
 	element.style.height = (0 >? event.client-y - y-diff <? y-lim) + \px
 
