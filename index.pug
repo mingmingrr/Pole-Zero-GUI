@@ -5,7 +5,7 @@ title Pole Zero Filter GUI
 link(rel='stylesheet' href='styles/style.css')
 script(type='text/javascript' src='vendor.js')
 
-svg#response
+svg#score
 #options.flex-container.flex-vertical.scalable
 	#bar.flex-container.draggable.fill-horizontal(dragtarget='#options')
 		.clickable.icon.triangle-left
@@ -16,15 +16,17 @@ svg#response
 			prevtarget='#bar .clickable.icon.triangle-left'
 			nexttarget='#bar .clickable.icon.triangle-right'
 			titletarget='#bar .bold')
-		#poles.slide-item.active
+		.slide-item
 			.slide-title Poles
-			| Slide A
-		#zeros.slide-item
+			#poles
+				| Slide A
+		.slide-item
 			.slide-title Zeros
-			| Slide B
-		#darts.slide-item
+			#zeros
+				| Slide B
+		.slide-item.active
 			.slide-title P/Z Plot
-			| Slide C
+			svg#darts
 		.slide-item
 			.slide-title Felix c:
 			img(src='http://i.imgur.com/5vMbdQw.gif')
