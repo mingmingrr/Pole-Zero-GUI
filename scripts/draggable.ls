@@ -11,6 +11,11 @@ mousemove = (event) !->
 	target.style.left = (0 >? event.client-x - x-diff <? x-lim) + \px
 	target.style.top  = (0 >? event.client-y - y-diff <? y-lim) + \px
 
+mouseup = (event) !->
+	element.style.cursor = \default
+	document.remove-event-listener \mousemove, mousemove
+	document.remove-event-listener \mouseup, mouseup
+
 element.add-event-listener \mousedown, (event) !->
 	target := if (element.get-attribute \dragtarget)?
 		then document.query-selector element.get-attribute \dragtarget
@@ -26,8 +31,5 @@ element.add-event-listener \mousedown, (event) !->
 		(parse-int parent-rect.height) - (parse-int target-rect.height)
 	element.style.cursor = \move
 	document.add-event-listener \mousemove, mousemove
-
-document.add-event-listener \mouseup, (event) !->
-	element.style.cursor = \default
-	document.remove-event-listener \mousemove, mousemove
+	document.add-event-listener \mouseup, mouseup
 

@@ -29,6 +29,8 @@ color3 = #000
 
 	.slide-item
 		display : none
+		width   : 100%
+		height  : 100%
 
 		.slide-title
 			display : none
@@ -52,6 +54,8 @@ img
 	max-height : 100%
 
 body
+	width    : 100vw
+	height   : 100vh
 	margin   : 0
 	overflow : hidden
 
@@ -77,25 +81,16 @@ body
 		cursor   : se-resize
 		user-select : none
 
-#response
-	padding-top    : 20px
-	padding-bottom : 30px
-	padding-left   : 50px
-	padding-right  : 20px
-	width  : 'calc(100vw - %s - %s)' % (@padding-left @padding-right)
-	height : 'calc(100vh - %s - %s)' % (@padding-top @padding-bottom)
+plot-dimensions(width, height, top, right, bottom, left)
+	padding-top    : top
+	padding-right  : right
+	padding-bottom : bottom
+	padding-left   : left
+	width  : 'calc(%s - %s - %s)' % (width  left right )
+	height : 'calc(%s - %s - %s)' % (height top  bottom)
 
-	// g.plot
-		// transform: translate(@padding-left, @padding-top)
-
-	g.x-axis
-		transform: 'translateY(%s)' % (@height)
-
-	// g.y-axis
-
-	// g.x-label
-
-	// g.y-label
+#score
+	plot-dimensions(100%, 100%, 20px, 20px, 30px, 50px)
 
 	path.line
 		fill   : none
@@ -103,6 +98,22 @@ body
 		stroke-linejoin : round
 		stroke-linecap  : butt
 		stroke-width    : 1.5
+
+#darts
+	plot-dimensions(100%, 100%, 30px, 30px, 30px, 30px)
+
+	.r-axis
+		circle
+			fill   : none
+			stroke : color2
+			stroke-dasharray : 5, 7 // perfect spacing
+
+		circle:last-of-type
+			stroke : color3
+			stroke-dasharray : none
+
+		line
+			@extend #darts .r-axis circle
 
 #options
 	position : absolute
@@ -122,4 +133,8 @@ body
 		// border-bottom-style : inherit
 
 	.slide-container
+		overflow-y : hidden
+
+	#poles
+	#zeros
 		overflow-y : auto

@@ -15,6 +15,10 @@ mousemove = (event) !->
 	element.style.width  = (0 >? event.client-x - x-diff <? x-lim) + \px
 	element.style.height = (0 >? event.client-y - y-diff <? y-lim) + \px
 
+mouseup = (event) !->
+	document.remove-event-listener \mousemove, mousemove
+	document.remove-event-listener \mouseup, mouseup
+
 corner.add-event-listener \mousedown, (event) !->
 	event.stop-propagation!
 	[corner-rect, element-rect, parent-rect] = map do
@@ -29,6 +33,5 @@ corner.add-event-listener \mousedown, (event) !->
 		(parse-int parent-rect.width) - (parse-int element-rect.left)
 		(parse-int parent-rect.height) - (parse-int element-rect.top)
 	document.add-event-listener \mousemove, mousemove
+	document.add-event-listener \mouseup, mouseup
 
-document.add-event-listener \mouseup, (event) !->
-	document.remove-event-listener \mousemove, mousemove
