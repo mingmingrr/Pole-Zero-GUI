@@ -59,15 +59,15 @@ do darts.rescale = !->
 	darts.r-axis .append \text .classed \unit, true .data [1]
 
 do darts.recalc = !->
-	darts.zeros .select-all \g .data (map Complex.polar, config.zeros)
+	darts.zeros .select-all \g
+		.data map Complex.polar, concat-map Complex.pair, config.zeros
 		.enter! .append \circle
-	darts.poles .select-all \g .data (map Complex.polar, config.poles)
+	darts.poles .select-all \g
+		.data map Complex.polar, concat-map Complex.pair, config.poles
 		.enter! .append \polygon .attr \points, darts.cross
 
 data-translate = (data) ->
-	p = darts.line [data]
-		|> (-> it[1 til -1])
-		|> unchars |> split ','
+	p = darts.line [data] .slice 1, -1 .split ','
 	"translate(#{p.0}px,#{p.1}px)"
 
 do darts.redraw = !->
