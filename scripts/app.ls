@@ -141,8 +141,10 @@ do score.replot = !->
 			.x ((.0) >> score.xi >> score.x)
 			.y ((.1) >> score.y)
 
-window.add-event-listener 'resize', !->
-	score.resize!
-	score.redraw!
-	score.replot!
+let score-parent = score.svg.node!.parent-element
+	attach-resize-listener score-parent
+	score-parent.add-event-listener 'resize', !->
+		score.resize!
+		score.redraw!
+		score.replot!
 

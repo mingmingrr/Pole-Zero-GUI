@@ -134,12 +134,18 @@ plot-dimensions(width, height, top, right, bottom, left)
 
 	.poles
 		polygon
-			fill : crimson
+			fill   : crimson
+			cursor : move
+		polygon:active
+			cursor : none
 
 	.zeros
 		circle
-			r : 5px
-			fill : limegreen
+			r      : 5px
+			fill   : limegreen
+			cursor : move
+		circle:active
+			cursor : none
 
 #options
 	position : absolute
