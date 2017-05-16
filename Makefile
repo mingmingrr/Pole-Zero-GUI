@@ -40,6 +40,11 @@ release: all
 	cd $(releasedir); zip -r9 ../release.zip *
 	cd $(releasedir); tar -zcvf ../release.tar.gz *
 
+.PHONY: watch
+watch: config
+	webpack --watch &
+	while true; do make --silent compile config; sleep 1; done
+
 $(packobj): compile config
 	webpack
 
