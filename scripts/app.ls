@@ -1,5 +1,5 @@
 require! d3
-require! 'prelude-ls': {id, negate, map, zip-with, concat-map, apply, take}
+require! 'prelude-ls': {id, negate, map, zip-with, concat-map, apply, take, unchars, split}
 
 require! './complex.js': Complex
 require! './numeric.js': Numeric
@@ -25,14 +25,19 @@ Pole zero plot config
 -------------------*/
 darts =
 	svg : d3 .select \svg#darts
-	r   : d3 .scaleLinear! .domain [0, 1.2]
+	r   : d3 .scale-linear! .domain [0, 1.2]
 let @ = darts
 	@g  = @svg .append \g
+	@line = d3 .radial-line! .radius ((.0) >> @r)
+		.angle ((.1) >> negate >> (+ (Math.PI / 2)))
 let @ = darts
 	@r-axis = @g .append \g .classed \r-axis, true
 	@t-axis = @g .append \g .classed \t-axis, true
 		..select-all \g .data d3.range 0, 360, 30 .enter!
 			.append \line .style \transform, (-> "rotate(#{it}deg)")
+	@zeros = @g .append \g .classed \zeros, true
+	@poles = @g .append \g .classed \poles, true
+	@cross = '0 2.8,3 5,5 3,2.8 0,5 -3,3 -5,0 -2.8,-3 -5,-5 -3,-2.8 0,-5 3,-3 5'
 
 /*-------------------
 Pole zero plot handling
@@ -53,15 +58,26 @@ do darts.rescale = !->
 	darts.r-axis .append \circle .classed \unit, true
 	darts.r-axis .append \text .classed \unit, true .data [1]
 
-# do darts.recalc = !=>
+do darts.recalc = !->
+	darts.zeros .select-all \g .data (map Complex.polar, config.zeros)
+		.enter! .append \circle
+	darts.poles .select-all \g .data (map Complex.polar, config.poles)
+		.enter! .append \polygon .attr \points, darts.cross
 
+data-translate = (data) ->
+	p = darts.line [data]
+		|> (-> it[1 til -1])
+		|> unchars |> split ','
+	"translate(#{p.0}px,#{p.1}px)"
 
 do darts.redraw = !->
 	darts.r-axis .select-all \circle.scale .attr \r, darts.r
 	darts.r-axis .select-all \text .attr \y, (darts.r >> (+ 1) >> negate) .text id
-	darts.r-axis.select \circle.unit .attr \r, darts.r 1
+	darts.r-axis .select \circle.unit .attr \r, darts.r 1
 	let radius = darts.r.range!.1
 		darts.t-axis .select-all \line .attr \x2, radius
+	darts.zeros .select-all \circle .style \transform, data-translate
+	darts.poles .select-all \polygon .style \transform, data-translate
 
 let darts-parent = darts.svg.node!.parent-element
 	attach-resize-listener darts-parent
@@ -118,8 +134,9 @@ do score.redraw = !->
 	score.y .domain [0, d3.max score.data, (.1)]
 	score.x-axis .call d3.axis-bottom score.x
 	score.y-axis .call d3.axis-left score.y
-	score.path .datum score.data .attr do
-		\d
+
+do score.replot = !->
+	score.path .datum score.data .attr \d, do
 		d3 .line!
 			.x ((.0) >> score.xi >> score.x)
 			.y ((.1) >> score.y)
@@ -127,4 +144,5 @@ do score.redraw = !->
 window.add-event-listener 'resize', !->
 	score.resize!
 	score.redraw!
+	score.replot!
 
