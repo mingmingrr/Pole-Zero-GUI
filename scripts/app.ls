@@ -1,5 +1,5 @@
 require! d3
-require! 'prelude-ls': {map, zip-with, concat-map, apply, take}
+require! 'prelude-ls': {id, negate, map, zip-with, concat-map, apply, take}
 
 require! './complex.js': Complex
 require! './numeric.js': Numeric
@@ -40,10 +40,24 @@ do darts.resize = !->
 	darts.g .style \transform, "translate(#{width/2}px,#{height/2}px)"
 	darts.r .range [0, (Math.min width, height)/2]
 
-do darts.redraw = !->
+do darts.rescale = !->
 	darts.r-axis .select-all \circle .remove!
-	darts.r-axis .select-all \g .data darts.r.ticks![1 til]
-		.enter! .append 'circle' .attr \r, darts.r
+	darts.r-axis .select-all \text .remove!
+	darts.r-axis .select-all \g
+		.data darts.r.ticks!.filter(-> &1 % 2 == 0 and &0 != 1)[1 til] .enter!
+			..append \circle .classed \scale, true
+			..append \text .classed \scale, true
+	darts.r-axis .append \circle .classed \unit, true
+	darts.r-axis .append \text .classed \unit, true .data [1]
+
+# do darts.recalc = !=>
+
+
+do darts.redraw = !->
+	darts.r-axis
+		..select-all \circle.scale .attr \r, darts.r
+		..select-all \text .attr \y, (darts.r >> (+ 1) >> negate) .text id
+	darts.r-axis.select \circle.unit .attr \r, darts.r 1
 
 let darts-parent = darts.svg.node!.parent-element
 	attach-resize-listener darts-parent
@@ -99,10 +113,11 @@ do score.redraw = !->
 	score.y .domain [0, d3.max score.data, (.1)]
 	score.x-axis .call d3.axis-bottom score.x
 	score.y-axis .call d3.axis-left score.y
-	score.line = d3 .line!
-		.x ((.0) >> score.xi >> score.x)
-		.y ((.1) >> score.y)
-	score.path .datum score.data .attr \d, score.line
+	score.path .datum score.data .attr do
+		\d
+		d3 .line!
+			.x ((.0) >> score.xi >> score.x)
+			.y ((.1) >> score.y)
 
 window.add-event-listener 'resize', !->
 	score.resize!

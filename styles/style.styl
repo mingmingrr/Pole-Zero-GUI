@@ -101,19 +101,27 @@ plot-dimensions(width, height, top, right, bottom, left)
 
 #darts
 	plot-dimensions(100%, 100%, 30px, 30px, 30px, 30px)
+	overflow : hidden
 
 	.r-axis
-		circle
+		circle.scale
 			fill   : none
 			stroke : color2
 			stroke-dasharray : 5, 7 // perfect spacing
 
-		circle:last-of-type
-			stroke : color3
+		circle.unit
+			@extend #darts .r-axis circle.scale
+			stroke : steelblue
 			stroke-dasharray : none
 
 		line
-			@extend #darts .r-axis circle
+			@extend #darts .r-axis circle.scale
+
+		text
+			font-size : 8pt
+			transform : rotate(-15deg)
+			text-anchor : middle
+
 
 #options
 	position : absolute
