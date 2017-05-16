@@ -57,11 +57,11 @@ do darts.rescale = !->
 
 
 do darts.redraw = !->
-	darts.r-axis
-		..select-all \circle.scale .attr \r, darts.r
-		..select-all \text .attr \y, (darts.r >> (+ 1) >> negate) .text id
+	darts.r-axis .select-all \circle.scale .attr \r, darts.r
+	darts.r-axis .select-all \text .attr \y, (darts.r >> (+ 1) >> negate) .text id
 	darts.r-axis.select \circle.unit .attr \r, darts.r 1
-	darts.t-axis .select-all \line .attr \x2, darts.r.range!.1
+	let radius = darts.r.range!.1
+		darts.t-axis .select-all \line .attr \x2, radius
 
 let darts-parent = darts.svg.node!.parent-element
 	attach-resize-listener darts-parent
