@@ -2,17 +2,24 @@
 
 color0 = #fff
 color1 = #ddd
-color2 = #666
-color3 = #000
+color2 = #aaa
+color3 = #666
+color4 = #000
 
 .clickable
 	cursor : pointer
 
 .icon.triangle-left
-	triangle-generator(10px, 10px, color2, 'w')
+	triangle-generator(10px, 10px, color3, 'w')
 
 .icon.triangle-right
-	triangle-generator(10px, 10px, color2, 'e')
+	triangle-generator(10px, 10px, color3, 'e')
+
+.icon.triangle-up
+	triangle-generator(10px, 10px, color3, 'n')
+
+.icon.triangle-down
+	triangle-generator(10px, 10px, color3, 's')
 
 .flex-container
 	display : flex
@@ -74,7 +81,7 @@ body
 	min-height : corner-size
 
 	.scalable-corner
-		triangle-generator(corner-size, corner-size, color2, 'se')
+		triangle-generator(corner-size, corner-size, color3, 'se')
 		position : absolute
 		bottom   : 0
 		right    : 0
@@ -100,13 +107,14 @@ plot-dimensions(width, height, top, right, bottom, left)
 		stroke-width    : 1.5
 
 #darts
-	plot-dimensions(100%, 100%, 30px, 30px, 30px, 30px)
+	plot-dimensions(100%, 100%, 10px, 10px, 10px, 10px)
 	overflow : hidden
 
 	.r-axis
 		circle.scale
 			fill   : none
 			stroke : color2
+			stroke-width : 1
 			stroke-dasharray : 5, 7 // perfect spacing
 
 		circle.unit
@@ -114,23 +122,24 @@ plot-dimensions(width, height, top, right, bottom, left)
 			stroke : steelblue
 			stroke-dasharray : none
 
-		line
-			@extend #darts .r-axis circle.scale
-
 		text
 			font-size : 8pt
-			transform : rotate(-15deg)
+			transform : rotate(-45deg)
 			text-anchor : middle
 
+	.t-axis
+		line
+			@extend #darts .r-axis circle.scale
+			stroke-dasharray : 3, 5
 
 #options
 	position : absolute
 	left     : 0
 	top      : 0
-	height   : 200px
-	width    : 200px
-	min-height       : 100px
-	min-width        : 100px
+	height   : 300px
+	width    : 300px
+	min-height       : 150px
+	min-width        : 150px
 	border-width     : 1px
 	border-style     : solid
 	background-color : hsla(0, 0, 100%, 0.8)

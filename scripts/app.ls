@@ -9,7 +9,7 @@ require! './util.js': {enumerate, trace, raise}
 require! './draggable.js'
 require! './scalable.js'
 require! './slide-container.js'
-require! './onresize.js':{attach-resize-listener}
+require! './onresize.js': {attach-resize-listener}
 
 raise \d3, d3
 
@@ -17,6 +17,7 @@ config =
 	poles      : [[0, 0.5]]
 	zeros      : [[1, 0], [-3/5, 4/5]]
 	scale      : 'linear'
+	frequency  : Math.PI
 	resolution : 128
 
 /*-------------------
@@ -30,6 +31,8 @@ let @ = darts
 let @ = darts
 	@r-axis = @g .append \g .classed \r-axis, true
 	@t-axis = @g .append \g .classed \t-axis, true
+		..select-all \g .data d3.range 0, 360, 30 .enter!
+			.append \line .style \transform, (-> "rotate(#{it}deg)")
 
 /*-------------------
 Pole zero plot handling
@@ -58,6 +61,7 @@ do darts.redraw = !->
 		..select-all \circle.scale .attr \r, darts.r
 		..select-all \text .attr \y, (darts.r >> (+ 1) >> negate) .text id
 	darts.r-axis.select \circle.unit .attr \r, darts.r 1
+	darts.t-axis .select-all \line .attr \x2, darts.r.range!.1
 
 let darts-parent = darts.svg.node!.parent-element
 	attach-resize-listener darts-parent
@@ -74,7 +78,7 @@ scales =
 
 score =
 	svg : d3 .select \svg#score
-	x   : d3 .scale-linear! .domain [0, Math.PI]
+	x   : d3 .scale-linear!
 	xi  : (* (2 * Math.PI / config.resolution))
 	y   : null
 let @ = score
@@ -88,6 +92,7 @@ let @ = score
 Frequency response handling
 ------------------*/
 do score.rescale = !->
+	score.x .domain [0, config.frequency]
 	score.y = scales[config.scale]!
 
 do score.resize = !->
