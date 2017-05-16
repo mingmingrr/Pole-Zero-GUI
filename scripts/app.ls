@@ -43,7 +43,9 @@ let @ = darts
 Pole zero plot handling
 -------------------*/
 do darts.resize = !->
-	{width, height} = window.get-computed-style darts.svg.node!
+	{width, height} = '#floaty .slide-container'
+		|> document.query-selector
+		|> window.get-computed-style
 	[width, height] = map parse-int, [width, height]
 	darts.g .style \transform, "translate(#{width/2}px,#{height/2}px)"
 	darts.r .range [0, (Math.min width, height)/2]
