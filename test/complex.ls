@@ -40,10 +40,19 @@ describe 'Properties', !->
 	specify 'Conjugate', !->
 		expect Complex.conj a
 			.to .be .deep .equal [-3, -4]
-	
+
 	specify 'Conjugate pairs', !->
 		expect Complex.pair a
 			.to .be .deep .equal [a, [-3, -4]]
+
+	describe 'Real or Complex', !->
+		specify 'Real', !->
+			expect Complex.is-real [2, 0]
+				.to .be .true
+
+		specify 'Complex', !->
+			expect Complex.is-real a
+				.to .be .false
 
 describe 'Transformations', !->
 	specify 'From numeric', !->

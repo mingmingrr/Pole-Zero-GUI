@@ -18,6 +18,8 @@ export real = (.0)
 
 export imag = (.1)
 
+export is-real = imag >> is-zero
+
 export negate = ([x, y]) ->
 	[-x, -y]
 
@@ -34,7 +36,7 @@ export conj = ([x, y]) ->
 	[x, -y]
 
 export pair = ->
-	if imag it |> is-zero
+	if is-real it
 		then [it]
 		else [it, conj it]
 
