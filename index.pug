@@ -5,9 +5,10 @@ title Pole Zero Filter GUI
 link(rel='stylesheet' href='styles/style.css')
 script(type='text/javascript' src='vendor.js')
 
-svg#score
-#options.flex-container.flex-vertical.scalable
-	#bar.flex-container.draggable.fill-horizontal(dragtarget='#options')
+div.fill-horizontal.fill-vertical
+	svg#score
+#floaty.flex-container.flex-vertical.scalable
+	#bar.flex-container.draggable.fill-horizontal(dragtarget='#floaty')
 		.clickable.icon.triangle-left
 		.bold
 		.clickable.icon.triangle-right
@@ -16,17 +17,45 @@ svg#score
 			prevtarget='#bar .clickable.icon.triangle-left'
 			nexttarget='#bar .clickable.icon.triangle-right'
 			titletarget='#bar .bold')
-		.slide-item
+		.slide-item.active
 			.slide-title Poles
 			#poles
+				ul.list-input
 				| Slide A
 		.slide-item
 			.slide-title Zeros
 			#zeros
+				ul.list-input
 				| Slide B
-		.slide-item.active
+		.slide-item
 			.slide-title P/Z Plot
 			svg#darts
+		.slide-item
+			.slide-title Options
+			#options
+				fieldset
+					legend Import
+					textarea(name='import' rows=2)
+				fieldset
+					legend Export
+					textarea(name='export' rows=2)
+				fieldset
+					legend Resolution
+					input(type='number' name='resolution' min=1 step=1)
+				fieldset
+					legend Gain
+					input(type='number' name='gain' min=0)
+				fieldset
+					legend Frequency
+					input(type='number' name='frequency' min=0)
+				fieldset
+					legend Axis
+					label
+						input(type='radio' name='axis' value='linear' checked)
+						span Linear
+					label
+						input(type='radio' name='axis' value='logarithmic')
+						span Logarithmic
 		.slide-item
 			.slide-title Felix c:
 			img(src='http://i.imgur.com/5vMbdQw.gif')
