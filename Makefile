@@ -43,13 +43,14 @@ release: all
 .PHONY: watch
 watch: config
 	webpack --watch &
-	while true; do make --silent compile config; sleep 1; done
+	while true; do make --quiet compile; sleep 1; done
 
 $(packobj): compile config
 	webpack
 
 $(jsobj) $(testobj) $(confobj): %.js: %.ls
 	lsc -pcb $< > $@
+	echo -e '  \033[1;30mcompiled\033[0m $<'
 
 $(cssobj): %.css: %.styl
 	stylus $<
