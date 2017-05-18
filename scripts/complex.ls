@@ -8,7 +8,9 @@ export const one = [1, 0]
 
 export const zero = [0, 0]
 
-export const i = j = [0, 1]
+export const i = [0, 1]
+
+export const j = [0, 1]
 
 export const e = [Math.E, 0]
 
