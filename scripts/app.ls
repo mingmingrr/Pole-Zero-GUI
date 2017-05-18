@@ -1,5 +1,5 @@
 require! d3
-require! 'prelude-ls': {compact, id, flip, each, negate, map, zip-with, concat-map, apply, take, unchars, split, is-it-NaN, filter, any}
+require! 'prelude-ls': {signum, compact, id, flip, each, negate, map, zip-with, concat-map, apply, take, unchars, split, is-it-NaN, filter, any}
 
 require! './complex.js': Complex
 require! './numeric.js': Numeric
@@ -33,6 +33,11 @@ config =
 	gain       : 1
 	resolution : 128
 
+get-dimensions = (node) ->
+	style = window.get-computed-style node
+	property = -> parse-float style.get-property-value it
+	[(property \width), (property \height)]
+
 /*-------------------
 Pole zero plot config
 -------------------*/
@@ -55,11 +60,8 @@ let @ = darts
 /*-------------------
 Pole zero plot handling
 -------------------*/
-do darts.resize = !->
-	{width, height} = '#floaty .slide-container'
-		|> document.query-selector
-		|> window.get-computed-style
-	[width, height] = map parse-int, [width, height]
+darts.resize = !->
+	[width, height] = get-dimensions document.get-element-by-id \darts
 	darts.g .style \transform, "translate(#{width/2}px,#{height/2}px)"
 	darts.r .range [0, (Math.min width, height)/2]
 
@@ -85,7 +87,7 @@ data-translate = (data) ->
 	p = darts.line [data] .slice 1, -1 .split ','
 	"translate(#{p.0}px,#{p.1}px)"
 
-do darts.redraw = !->
+darts.redraw = !->
 	darts.r-axis .select-all \circle.scale .attr \r, darts.r
 	darts.r-axis .select-all \text .attr \y, (darts.r >> (+ 1) >> negate) .text id
 	darts.r-axis .select \circle.unit .attr \r, darts.r 1
@@ -103,10 +105,6 @@ let darts-parent = darts.svg.node!.parent-element
 /*------------------
 Frequency response config
 ------------------*/
-scales =
-	linear      : d3.scale-linear
-	logarithmic : d3.scale-log
-
 score =
 	svg : d3 .select \svg#score
 	x   : d3 .scale-linear!
@@ -123,28 +121,30 @@ let @ = score
 Frequency response handling
 ------------------*/
 do score.rescale = !->
+	scales =
+		linear      : d3.scale-linear
+		logarithmic : d3.scale-log
 	score.x .domain [0, config.frequency]
 	score.y = scales[config.scale]!
 
 do score.resize = !->
-	{width, height} = window.get-computed-style score.svg.node!
-	[width, height] = map parse-int, [width, height]
+	[width, height] = get-dimensions score.svg.node!
 	score.x .range [0, width]
 	score.y .range [height, 0]
 	score.x-axis .style \transform, "translateY(#{height}px)"
 
-poly-fft = (concat-map Complex.pair)
-	>> (Numeric.to-polynomial)
-	>> (fft config.resolution)
-	>> (-> take (it.length / 2 + 1), it)
-
 do score.recalc = !->
+	poly-fft = (concat-map Complex.pair)
+		>> (Numeric.to-polynomial)
+		>> (fft config.resolution)
+		>> (-> take (it.length / 2 + 1), it)
 	score.data = [config.zeros, config.poles]
 		|> map poly-fft
 		|> apply (zip-with Complex.div)
 		|> map (Complex.abs >> (* config.gain))
 		|> enumerate
 		|> filter (-> it.1? and not is-it-NaN it.1)
+		|> (-> console.log JSON.stringify it; it)
 
 do score.redraw = !->
 	score.y .domain [0, d3.max score.data, (.1)]
@@ -167,9 +167,20 @@ let score-parent = score.svg.node!.parent-element
 /*------------------
 P/Z list change handling
 ------------------*/
-recalc-cascade = ->
+recalc-cascade = !->
 	darts.recalc!
 	darts.redraw!
+	score.recalc!
+	score.redraw!
+	score.replot!
+
+rescale-cascade = !->
+	darts.resize
+	darts.recalc!
+	darts.rescale!
+	darts.redraw!
+	score.rescale!
+	score.resize!
 	score.recalc!
 	score.redraw!
 	score.replot!
@@ -184,8 +195,39 @@ let target = document.query-selector '#poles .list-input'
 let target = document.query-selector '#zeros .list-input'
 	target.add-event-listener \change, (event) !->
 		config.zeros = target.get-elements-by-tag-name \li
-			|> map (JSON.parse . trace . (.get-attribute \value))
+			|> map (JSON.parse . (.get-attribute \value))
 			|> compact
 		recalc-cascade!
 
+/*------------------
+Options handling
+------------------*/
+options = document.get-element-by-id \options
+
+let input = options.query-selector "input[name='resolution']"
+	input.value = config.resolution
+	input.add-event-listener \change, (event) !->
+		value = input.value |> parse-int
+		round = value |> Math.log2 |> Math.round
+		diff = round |> (2 ^) |> (value -)
+		input.value = round |> (+ (signum diff)) |> (2 ^)
+		config.resolution := input.value
+		rescale-cascade!
+
+let input = options.query-selector "input[name='gain']"
+	input.value = config.gain
+	input.add-event-listener \change, (event) !->
+		config.gain := parse-float input.value
+		recalc-cascade!
+
+let input = options.query-selector "input[name='frequency']"
+	input.value = config.frequency
+	input.add-event-listener \change, (event) !->
+		config.frequency := parse-float input.value
+		rescale-cascade!
+
+(flip each) (options.query-selector-all "input[name='axis']"), (input) !->
+	input.add-event-listener \click, (event) !->
+		config.scale := input.value
+		rescale-cascade!
 
