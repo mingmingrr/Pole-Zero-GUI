@@ -1,4 +1,6 @@
-require! 'prelude-ls': {zip, zipWith}
+require! 'prelude-ls': {zip, zip-with, zip-all, drop, apply}
+
+require! './util.js': {trace}
 
 export raise = (key, value=eval(key), log=false) !->
 	window[key] = value
@@ -16,4 +18,10 @@ export enumerate = ->
 
 export enumerate-with = (f, a) -->
 	zip-with f, [0 til a.length], a
+
+export peek = (n, a) -->
+	[a] * n
+	|> enumerate-with do
+		-> drop &0, &1
+	|> apply zip-all
 

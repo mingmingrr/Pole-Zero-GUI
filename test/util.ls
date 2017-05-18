@@ -19,3 +19,7 @@ specify 'Enumerate with', !->
 	expect Util.enumerate-with (+), <[a b c]>
 		.to .be .deep .equal [\0a, \1b, \2c]
 
+specify 'Peek zip', !->
+	expect Util.peek 3, [1 to 5]
+		.to .be .deep .equal [[1, 2, 3], [2, 3, 4], [3, 4, 5]]
+
