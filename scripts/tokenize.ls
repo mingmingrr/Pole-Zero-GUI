@@ -25,6 +25,7 @@ regex =
 			Token.left-brackets
 			Token.right-brackets
 			Token.operators
+			Token.separators
 
 split = ([reg, head, tail, pool], string) -->
 	parts = reg.exec string

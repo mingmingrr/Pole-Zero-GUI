@@ -32,6 +32,11 @@ specify 'Operators', !->
 		.to .be .an \object
 		.and .contain .all .keys \+, \/
 
+specify 'Separators', !->
+	expect Token.separators
+		.to .be .an \object
+		.and .contain .all .keys ','
+
 specify 'Functions', !->
 	expect Token.functions
 		.to .be .an \object

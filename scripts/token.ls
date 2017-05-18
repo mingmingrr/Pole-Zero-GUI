@@ -1,4 +1,4 @@
-require! 'prelude-ls': {map, concat-map, pairs-to-obj, obj-to-pairs}
+require! 'prelude-ls': {map, concat-map, pairs-to-obj, obj-to-pairs, apply}
 
 require! './complex.js': Complex
 require! './util.js': {trace}
@@ -9,18 +9,23 @@ export class Number extends Token
 	(value) ->
 		@value = Complex.Complex value
 
+export class Constant extends Number
+	-> super ...
+
 export constants =
-	pi : new Number Complex.pi
-	e  : new Number Complex.e
-	j  : new Number Complex.i
-	i  : new Number Complex.j
+	pi : new Constant Complex.pi
+	e  : new Constant Complex.e
+	j  : new Constant Complex.i
+	i  : new Constant Complex.j
 
 export class Bracket extends Token
 	(@val, @comp) ->
 
 export class LeftBracket extends Bracket
+	-> super ...
 
 export class RightBracket extends Bracket
+	-> super ...
 
 export brackets = do
 	<[() [] {}]>
@@ -48,11 +53,22 @@ export operators =
 	'/' : new Operator Complex.div, 2, 'l'
 	'^' : new Operator Complex.pow, 3, 'r'
 
+export class Separator extends Token
+	(@type) ->
+
+export separators =
+	',' : new Separator ','
+
 export class Function extends Token
 	(@func) ->
 
 export class RealFunction extends Function
-	(@func) ->
+	(func) ->
+		@func = (...args) ->
+			for arg in args
+				unless Complex.is-real arg
+					throw new Error 'complex argument to real function'
+			apply func, map Complex.real, args
 
 export functions =
 	sin  : new RealFunction Math.sin
