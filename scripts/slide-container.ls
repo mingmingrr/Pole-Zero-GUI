@@ -36,6 +36,7 @@ shift-active = (shamt, event) -->
 	if titled
 		active-source.append-child title-target.query-selector \.slide-title
 		title-target.append-child active-target.query-selector \.slide-title
+	active-target.dispatch-event new Event \resize
 
 if prev-target?
 	prev-target.add-event-listener \click, shift-active (-1)
