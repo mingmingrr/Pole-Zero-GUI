@@ -122,8 +122,8 @@ Frequency response handling
 ------------------*/
 do score.rescale = !->
 	scales =
-		linear      : d3.scale-linear
-		logarithmic : d3.scale-log
+		linear      : -> d3.scale-linear!
+		logarithmic : -> d3.scale-log!.base 10
 	score.x .domain [0, config.frequency]
 	score.y = scales[config.scale]!
 
@@ -144,10 +144,14 @@ do score.recalc = !->
 		|> map (Complex.abs >> (* config.gain))
 		|> enumerate
 		|> filter (-> it.1? and not is-it-NaN it.1)
-		|> (-> console.log JSON.stringify it; it)
+	if config.scale == \logarithmic
+		score.data = score.data
+			|> filter (-> it.1 != 0)
 
 do score.redraw = !->
-	score.y .domain [0, d3.max score.data, (.1)]
+	[min, max] = d3.extent score.data, (.1)
+	min := 0 unless config.scale == \logarithmic
+	score.y .domain [min, max]
 	score.x-axis .call d3.axis-bottom score.x
 	score.y-axis .call d3.axis-left score.y
 
