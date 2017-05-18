@@ -1,23 +1,36 @@
 require! d3
-require! 'prelude-ls': {id, negate, map, zip-with, concat-map, apply, take, unchars, split}
+require! 'prelude-ls': {compact, id, flip, each, negate, map, zip-with, concat-map, apply, take, unchars, split, is-it-NaN, filter, any}
 
 require! './complex.js': Complex
 require! './numeric.js': Numeric
 require! './fft.js': {fft}
+require! './evaluate.js': {evaluate}
 require! './util.js': {enumerate, trace, raise}
 
 require! './draggable.js'
 require! './scalable.js'
 require! './slide-container.js'
+require! './list-input.js'
 require! './onresize.js': {attach-resize-listener}
+
+(flip each) (document.query-selector-all \.list-input), (element) !->
+	element.validate = (value) ->
+		try
+			result = evaluate value
+			return
+				value: value
+				result: result
+		catch
+			return null
 
 raise \d3, d3
 
 config =
-	poles      : [[0, 0.5]]
-	zeros      : [[1, 0], [-3/5, 4/5]]
+	poles      : []
+	zeros      : []
 	scale      : 'linear'
 	frequency  : Math.PI
+	gain       : 1
 	resolution : 128
 
 /*-------------------
@@ -129,8 +142,9 @@ do score.recalc = !->
 	score.data = [config.zeros, config.poles]
 		|> map poly-fft
 		|> apply (zip-with Complex.div)
-		|> map Complex.abs
+		|> map (Complex.abs >> (* config.gain))
 		|> enumerate
+		|> filter (-> it.1? and not is-it-NaN it.1)
 
 do score.redraw = !->
 	score.y .domain [0, d3.max score.data, (.1)]
@@ -149,4 +163,29 @@ let score-parent = score.svg.node!.parent-element
 		score.resize!
 		score.redraw!
 		score.replot!
+
+/*------------------
+P/Z list change handling
+------------------*/
+recalc-cascade = ->
+	darts.recalc!
+	darts.redraw!
+	score.recalc!
+	score.redraw!
+	score.replot!
+
+let target = document.query-selector '#poles .list-input'
+	target.add-event-listener \change, (event) !->
+		config.poles = target.get-elements-by-tag-name \li
+			|> map (JSON.parse . (.get-attribute \value))
+			|> compact
+		recalc-cascade!
+
+let target = document.query-selector '#zeros .list-input'
+	target.add-event-listener \change, (event) !->
+		config.zeros = target.get-elements-by-tag-name \li
+			|> map (JSON.parse . trace . (.get-attribute \value))
+			|> compact
+		recalc-cascade!
+
 
