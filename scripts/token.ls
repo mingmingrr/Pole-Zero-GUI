@@ -15,8 +15,8 @@ export class Constant extends Number
 export constants =
 	pi : new Constant Complex.pi
 	e  : new Constant Complex.e
-	j  : new Constant Complex.i
-	i  : new Constant Complex.j
+	j  : new Constant Complex.j
+	i  : new Constant Complex.i
 
 export class Bracket extends Token
 	(@val, @comp) ->
