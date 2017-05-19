@@ -23,6 +23,7 @@ create-input = (item, init=null) ->
 		if input.value == '' and init?
 			removed := true
 			item.remove!
+			container.dispatch-event new Event \change
 		else if (valid = validate input.value)?
 			removed := true
 			{result, value} = valid
