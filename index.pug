@@ -32,12 +32,6 @@ div.fill-horizontal.fill-vertical
 			.slide-title Options
 			#options
 				fieldset
-					legend Import
-					textarea(name='import' rows=2)
-				fieldset
-					legend Export
-					textarea(name='export' rows=2)
-				fieldset
 					legend Resolution
 					input(type='number' name='resolution' min=4 step=1)
 				fieldset
@@ -54,6 +48,12 @@ div.fill-horizontal.fill-vertical
 					label
 						input(type='radio' name='axis' value='logarithmic')
 						span Logarithmic
+				fieldset
+					legend Import
+					textarea(name='import' rows=2 placeholder='Import roots')
+				fieldset
+					legend Export
+					textarea(name='export' rows=2 placeholder='Export coefficients')
 		.slide-item
 			.slide-title Felix c:
 			img(src='http://i.imgur.com/5vMbdQw.gif')

@@ -1,5 +1,5 @@
 require! d3
-require! 'prelude-ls': {signum, compact, id, flip, each, negate, map, zip-with, concat-map, apply, take, unchars, split, is-it-NaN, filter, any}
+require! 'prelude-ls': {flatten, signum, compact, id, flip, each, negate, map, zip-with, concat-map, apply, take, unchars, split, is-it-NaN, filter, any}
 
 require! './complex.js': Complex
 require! './numeric.js': Numeric
@@ -18,8 +18,8 @@ require! './onresize.js': {attach-resize-listener}
 		try
 			result = evaluate value
 			return
-				value: value
-				result: result
+				value  : value
+				result : result
 		catch
 			return null
 
@@ -31,7 +31,7 @@ config =
 	scale      : 'linear'
 	frequency  : Math.PI
 	gain       : 1
-	resolution : 128
+	resolution : 256
 
 get-dimensions = (node) ->
 	style = window.get-computed-style node
@@ -76,11 +76,15 @@ do darts.rescale = !->
 	darts.r-axis .append \text .classed \unit, true .data [1]
 
 do darts.recalc = !->
+	darts.zeros .select-all \circle .remove!
+	darts.poles .select-all \polygon .remove!
 	darts.zeros .select-all \g
-		.data map Complex.polar, concat-map Complex.pair, config.zeros
+		.data map Complex.polar, do
+			concat-map Complex.pair, config.zeros
 		.enter! .append \circle
 	darts.poles .select-all \g
-		.data map Complex.polar, concat-map Complex.pair, config.poles
+		.data map Complex.polar, do
+			concat-map Complex.pair, config.poles
 		.enter! .append \polygon .attr \points, darts.cross
 
 data-translate = (data) ->
@@ -88,13 +92,19 @@ data-translate = (data) ->
 	"translate(#{p.0}px,#{p.1}px)"
 
 darts.redraw = !->
-	darts.r-axis .select-all \circle.scale .attr \r, darts.r
-	darts.r-axis .select-all \text .attr \y, (darts.r >> (+ 1) >> negate) .text id
-	darts.r-axis .select \circle.unit .attr \r, darts.r 1
+	darts.r-axis .select-all \circle.scale
+		.attr \r, darts.r
+	darts.r-axis .select-all \text
+		.attr \y, (darts.r >> (+ 1) >> negate) .text id
+	darts.r-axis .select \circle.unit
+		.attr \r, darts.r 1
 	let radius = darts.r.range!.1
-		darts.t-axis .select-all \line .attr \x2, radius
-	darts.zeros .select-all \circle .style \transform, data-translate
-	darts.poles .select-all \polygon .style \transform, data-translate
+		darts.t-axis .select-all \line
+			.attr \x2, radius
+	darts.zeros .select-all \circle
+		.style \transform, data-translate
+	darts.poles .select-all \polygon
+		.style \transform, data-translate
 
 let darts-parent = darts.svg.node!.parent-element
 	attach-resize-listener darts-parent
@@ -146,7 +156,7 @@ do score.recalc = !->
 		|> filter (-> it.1? and not is-it-NaN it.1)
 	if config.scale == \logarithmic
 		score.data = score.data
-			|> filter (-> it.1 != 0)
+			|> filter (-> it.1 > 1e-4)
 
 do score.redraw = !->
 	[min, max] = d3.extent score.data, (.1)
@@ -172,22 +182,25 @@ let score-parent = score.svg.node!.parent-element
 P/Z list change handling
 ------------------*/
 recalc-cascade = !->
-	darts.recalc!
-	darts.redraw!
-	score.recalc!
-	score.redraw!
-	score.replot!
+	darts
+		..recalc!
+		..redraw!
+	score
+		..recalc!
+		..redraw!
+		..replot!
 
 rescale-cascade = !->
-	darts.resize
-	darts.recalc!
-	darts.rescale!
-	darts.redraw!
-	score.rescale!
-	score.resize!
-	score.recalc!
-	score.redraw!
-	score.replot!
+	darts
+		..resize!
+		..recalc!
+	score
+		..rescale!
+		..rescale!
+		..resize!
+		..recalc!
+		..redraw!
+		..replot!
 
 let target = document.query-selector '#poles .list-input'
 	target.add-event-listener \change, (event) !->
@@ -210,13 +223,15 @@ options = document.get-element-by-id \options
 
 let input = options.query-selector "input[name='resolution']"
 	input.value = config.resolution
-	input.add-event-listener \change, (event) !->
+	listener = (event) !->
 		value = input.value |> parse-int
 		round = value |> Math.log2 |> Math.round
 		diff = round |> (2 ^) |> (value -)
 		input.value = round |> (+ (signum diff)) |> (2 ^)
 		config.resolution := input.value
 		rescale-cascade!
+	input.add-event-listener \change, listener
+	input.add-event-listener \click, listener
 
 let input = options.query-selector "input[name='gain']"
 	input.value = config.gain
@@ -234,4 +249,24 @@ let input = options.query-selector "input[name='frequency']"
 	input.add-event-listener \click, (event) !->
 		config.scale := input.value
 		rescale-cascade!
+
+/*------------------
+Import export handling
+------------------*/
+let textarea = options.query-selector "textarea[name='export']"
+	textarea.add-event-listener \click, (event) ->
+		[poles, zeros] = [config.poles, config.zeros]
+			|> map do
+				(concat-map Complex.pair)
+				>> Numeric.to-polynomial
+				>> (map Complex.to-string)
+				>> (-> "[#it]")
+		textarea.value = "A = #{poles}\nB = #{zeros}"
+
+let textarea = options.query-selector "textarea[name='import']"
+	listener = (event) ->
+		value = textarea.value
+		alert 'Polynomial factorization is not implemented yet'
+	textarea.add-event-listener \change, listener
+
 

@@ -22,6 +22,16 @@ export imag = (.1)
 
 export is-real = imag >> is-zero
 
+export to-string = ([x, y]) ->
+	[a, b] = [(is-zero x), (is-zero y)]
+	switch
+	| a and b => '0'
+	| b => "#x"
+	| a => "#{y}i"
+	| otherwise => if b < 0
+		then "#{x}#{y}i"
+		else "#{x}+#{y}i"
+
 export negate = ([x, y]) ->
 	[-x, -y]
 
