@@ -46,9 +46,13 @@ create-input = (item, init=null) ->
 		listener ...
 	return input
 
-create-item = ->
+create-item = (init=null) ->
 	item = document.create-element \li
-	item.append-child create-input item
+	if init? and (valid = validate init)?
+		item.set-attribute \value, JSON.stringify valid.result
+		item.text-content = valid.value
+	else
+		item.append-child create-input item, init
 	item.add-event-listener \click, (event) !->
 		input = create-input item, item.text-content
 		item.text-content = ''
@@ -57,4 +61,7 @@ create-item = ->
 	return item
 
 container.append-child create-item!
+
+container.create-item = ->
+	container.append-child create-item it
 

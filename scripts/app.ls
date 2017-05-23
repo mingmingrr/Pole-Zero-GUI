@@ -1,5 +1,5 @@
 require! d3
-require! 'prelude-ls': {flatten, signum, compact, id, flip, each, negate, map, zip-with, concat-map, apply, take, unchars, split, is-it-NaN, filter, any}
+require! 'prelude-ls': {flatten, signum, compact, id, flip, each, negate, map, zip-with, concat-map, apply, take, unchars, split, is-it-NaN, filter, any, elem-index, minimum}
 
 require! './complex.js': Complex
 require! './numeric.js': Numeric
@@ -13,6 +13,8 @@ require! './slide-container.js'
 require! './list-input.js'
 require! './onresize.js': {attach-resize-listener}
 
+raise \d3, d3
+
 (flip each) (document.query-selector-all \.list-input), (element) !->
 	element.validate = (value) ->
 		try
@@ -23,20 +25,38 @@ require! './onresize.js': {attach-resize-listener}
 		catch
 			return null
 
-raise \d3, d3
-
 config =
 	poles      : []
 	zeros      : []
-	scale      : 'linear'
+	scale      : \linear
 	frequency  : Math.PI
 	gain       : 1
 	resolution : 256
 
+sync-darts = ->
+	[poles, zeros] = <[poles zeros]>
+	|> map (-> document.query-selector ('#'+"#it .list-input"))
+	[poles, zeros]
+	|> map ->
+			it.query-selector-all ':scope > li'
+			|> map (-> it.remove!)
+	config.poles ++ [null]
+		|> map ->
+			if it?
+				then poles.create-item (Complex.to-string it)
+				else poles.create-item!
+	config.zeros ++ [null]
+		|> map ->
+			if it?
+				then zeros.create-item (Complex.to-string it)
+				else zeros.create-item!
+
 get-dimensions = (node) ->
 	style = window.get-computed-style node
 	property = -> parse-float style.get-property-value it
-	[(property \width), (property \height)]
+	return do
+		width: property \width
+		height: property \height
 
 /*-------------------
 Pole zero plot config
@@ -57,11 +77,17 @@ let @ = darts
 	@poles = @g .append \g .classed \poles, true
 	@cross = '0 2.8,3 5,5 3,2.8 0,5 -3,3 -5,0 -2.8,-3 -5,-5 -3,-2.8 0,-5 3,-3 5'
 
+/*------------------
+Pole zero drag listener
+------------------*/
+closest-dart = (dart, list) -->
+	dist = minimum-by ((- num) >> Complex.abs2), list
+
 /*-------------------
 Pole zero plot handling
 -------------------*/
 darts.resize = !->
-	[width, height] = get-dimensions document.get-element-by-id \darts
+	{width, height} = get-dimensions document.get-element-by-id \darts
 	darts.g .style \transform, "translate(#{width/2}px,#{height/2}px)"
 	darts.r .range [0, (Math.min width, height)/2]
 
@@ -138,7 +164,7 @@ do score.rescale = !->
 	score.y = scales[config.scale]!
 
 do score.resize = !->
-	[width, height] = get-dimensions score.svg.node!
+	{width, height} = get-dimensions score.svg.node!
 	score.x .range [0, width]
 	score.y .range [height, 0]
 	score.x-axis .style \transform, "translateY(#{height}px)"
@@ -156,7 +182,7 @@ do score.recalc = !->
 		|> filter (-> it.1? and not is-it-NaN it.1)
 	if config.scale == \logarithmic
 		score.data = score.data
-			|> filter (-> it.1 > 1e-4)
+			|> filter (-> it.1 > 1e-5)
 
 do score.redraw = !->
 	[min, max] = d3.extent score.data, (.1)
@@ -229,7 +255,7 @@ let input = options.query-selector "input[name='resolution']"
 		diff = round |> (2 ^) |> (value -)
 		input.value = round |> (+ (signum diff)) |> (2 ^)
 		config.resolution := input.value
-		rescale-cascade!
+		recalc-cascade!
 	input.add-event-listener \change, listener
 	input.add-event-listener \click, listener
 
@@ -255,18 +281,33 @@ Import export handling
 ------------------*/
 let textarea = options.query-selector "textarea[name='export']"
 	textarea.add-event-listener \click, (event) ->
-		[poles, zeros] = [config.poles, config.zeros]
+		[a, b] = [config.poles, config.zeros]
 			|> map do
 				(concat-map Complex.pair)
 				>> Numeric.to-polynomial
 				>> (map Complex.to-string)
-				>> (-> "[#it]")
-		textarea.value = "A = #{poles}\nB = #{zeros}"
+				>> (.join ', ')
+		[poles, zeros] = [config.poles, config.zeros]
+			|> map do
+				(concat-map Complex.pair)
+				>> (map Complex.to-string)
+				>> (.join ', ')
+		textarea.value = "B = [#b]\nA = [#a]\nzeros = [#zeros]\npoles = [#poles]"
 
 let textarea = options.query-selector "textarea[name='import']"
-	listener = (event) ->
-		value = textarea.value
-		alert 'Polynomial factorization is not implemented yet'
-	textarea.add-event-listener \change, listener
-
+	textarea.add-event-listener \change, (event) !->
+		[poles, zeros] = [null, null]
+		try
+			[poles, zeros] =
+				[/poles?\s*=\s*\[(.*?)\]/mi, /zeros?\s*=\s*\[(.*?)\]/mi]
+				|> map do
+					(.exec textarea.value)
+					>> (.1) >> (/ ',')
+					>> (filter (!= ''))
+					>> (map evaluate)
+			[config.poles, config.zeros] = [poles, zeros]
+		catch
+			return
+		sync-darts!
+		recalc-cascade!
 

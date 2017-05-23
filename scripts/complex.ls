@@ -28,7 +28,7 @@ export to-string = ([x, y]) ->
 	| a and b => '0'
 	| b => "#x"
 	| a => "#{y}i"
-	| otherwise => if b < 0
+	| otherwise => if y < 0
 		then "#{x}#{y}i"
 		else "#{x}+#{y}i"
 

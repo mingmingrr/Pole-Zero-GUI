@@ -17,7 +17,7 @@ div.fill-horizontal.fill-vertical
 			prevtarget='#bar .clickable.icon.triangle-left'
 			nexttarget='#bar .clickable.icon.triangle-right'
 			titletarget='#bar .bold')
-		.slide-item.active
+		.slide-item
 			.slide-title Poles
 			#poles
 				ul.list-input
@@ -28,7 +28,7 @@ div.fill-horizontal.fill-vertical
 		.slide-item
 			.slide-title P/Z Plot
 			svg#darts
-		.slide-item
+		.slide-item.active
 			.slide-title Options
 			#options
 				fieldset
@@ -50,10 +50,11 @@ div.fill-horizontal.fill-vertical
 						span Logarithmic
 				fieldset
 					legend Import
-					textarea(name='import' rows=2 placeholder='Import roots')
+					textarea(name='import' rows=2 placeholder='zeros = []\npoles = []')
 				fieldset
 					legend Export
-					textarea(name='export' rows=2 placeholder='Export coefficients')
+					textarea(name='export' rows=4
+						placeholder='B = []\nA = []\nzeros = []\npoles = []')
 		.slide-item
 			.slide-title Felix c:
 			img(src='http://i.imgur.com/5vMbdQw.gif')

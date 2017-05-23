@@ -71,6 +71,31 @@ describe 'Transformations', !->
 		expect Complex.rect p
 			.to .be .deep .closeTo a, d
 
+	describe 'To string', !->
+		specify 'Zero zero', !->
+			expect Complex.to-string [0, 0]
+				.to .equal \0
+
+		specify 'Real only', !->
+			expect Complex.to-string [2, 0]
+				.to .equal \2
+
+		specify 'Complex only', !->
+			expect Complex.to-string [0, 2]
+				.to .equal \2i
+
+		specify 'Positive positive', !->
+			expect Complex.to-string [2, 2]
+				.to .equal \2+2i
+
+		specify 'Positive negative', !->
+			expect Complex.to-string [2, -2]
+				.to .equal \2-2i
+
+		specify 'Negative zero', !->
+			expect Complex.to-string [-2, 0]
+				.to .equal \-2
+
 describe 'Operations', !->
 	specify 'Addition', !->
 		expect Complex.add a, b
