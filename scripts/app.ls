@@ -224,7 +224,7 @@ Frequency response config
 score =
 	svg : d3 .select \svg#score
 	x   : d3 .scale-linear!
-	xi  : (* (2 * Math.PI / config.resolution))
+	xi  : (* (2 * config.frequency / config.resolution))
 	y   : null
 let @ = score
 	@g  = @svg .append \g
