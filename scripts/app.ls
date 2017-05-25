@@ -1,5 +1,5 @@
 require! d3
-require! 'prelude-ls': {flatten, signum, compact, id, flip, each, negate, map, zip-with, concat-map, apply, take, unchars, split, is-it-NaN, filter, any, elem-index, minimum}
+require! 'prelude-ls': {minimum-by, partition, sort-by, flatten, signum, compact, id, flip, each, negate, map, zip-with, concat-map, apply, take, unchars, split, is-it-NaN, filter, any, elem-index, minimum}
 
 require! './complex.js': Complex
 require! './numeric.js': Numeric
@@ -58,6 +58,18 @@ get-dimensions = (node) ->
 		width: property \width
 		height: property \height
 
+min-index-by = (func, list) -->
+	elem-index (minimum-by func, list), list
+
+closest-index-to = (num, list) -->
+	num = Complex.top num
+	min-index-by do
+		Complex.top
+		>> Complex.polar
+		>> (Complex.sub num)
+		>> Complex.abs2
+		list
+
 /*-------------------
 Pole zero plot config
 -------------------*/
@@ -76,12 +88,59 @@ let @ = darts
 	@zeros = @g .append \g .classed \zeros, true
 	@poles = @g .append \g .classed \poles, true
 	@cross = '0 2.8,3 5,5 3,2.8 0,5 -3,3 -5,0 -2.8,-3 -5,-5 -3,-2.8 0,-5 3,-3 5'
-
-/*------------------
-Pole zero drag listener
-------------------*/
-closest-dart = (dart, list) -->
-	dist = minimum-by ((- num) >> Complex.abs2), list
+	@z-drag = d3.drag!
+		.on \start, (data) !->
+			idx = closest-index-to data, config.zeros
+			[config.zeros[*-1], config.zeros[idx]] =
+				[config.zeros[idx], config.zeros[*-1]]
+		.on \drag, (data) !->
+			{x, y} = d3.event
+			[x, y] = map darts.r.invert, [x, y]
+			config.zeros[*-1] = [x, y]
+			sync-darts!
+			recalc-cascade!
+	@z-context = (data) !->
+		d3.event.prevent-default!
+		config.zeros.splice do
+			closest-index-to data, config.zeros
+			1
+		sync-darts!
+		recalc-cascade!
+	@z-dblclick = (data) !->
+		d3.event.prevent-default!
+		z = trace config.zeros.splice do
+			closest-index-to data, config.zeros
+			1
+		config.poles.push z.0
+		sync-darts!
+		recalc-cascade!
+	@p-drag = d3.drag!
+		.on \start, (data) !->
+			idx = closest-index-to data, config.poles
+			[config.poles[*-1], config.poles[idx]] =
+				[config.poles[idx], config.poles[*-1]]
+		.on \drag, (data) !->
+			{x, y} = d3.event
+			[x, y] = map darts.r.invert, [x, y]
+			config.poles[*-1] = [x, y]
+			sync-darts!
+			recalc-cascade!
+	@p-context = (data) !->
+		d3.event.prevent-default!
+		config.poles.splice do
+			closest-index-to data, config.poles
+			1
+		sync-darts!
+		recalc-cascade!
+	@p-dblclick = (data) !->
+		d3.event.prevent-default!
+		z = config.poles.splice do
+			closest-index-to data, config.poles
+			1
+		config.zeros.push z.0
+		sync-darts!
+		recalc-cascade!
+raise \darts, darts
 
 /*-------------------
 Pole zero plot handling
@@ -108,16 +167,22 @@ do darts.recalc = !->
 		.data map Complex.polar, do
 			concat-map Complex.pair, config.zeros
 		.enter! .append \circle
+			.call darts.z-drag
+			.on \contextmenu, darts.z-context
+			.on \dblclick, darts.z-dblclick
 	darts.poles .select-all \g
 		.data map Complex.polar, do
 			concat-map Complex.pair, config.poles
 		.enter! .append \polygon .attr \points, darts.cross
+			.call darts.p-drag
+			.on \contextmenu, darts.p-context
+			.on \dblclick, darts.p-dblclick
 
 data-translate = (data) ->
 	p = darts.line [data] .slice 1, -1 .split ','
 	"translate(#{p.0}px,#{p.1}px)"
 
-darts.redraw = !->
+darts.reaxis = !->
 	darts.r-axis .select-all \circle.scale
 		.attr \r, darts.r
 	darts.r-axis .select-all \text
@@ -127,6 +192,8 @@ darts.redraw = !->
 	let radius = darts.r.range!.1
 		darts.t-axis .select-all \line
 			.attr \x2, radius
+
+darts.redraw = !->
 	darts.zeros .select-all \circle
 		.style \transform, data-translate
 	darts.poles .select-all \polygon
@@ -136,6 +203,7 @@ let darts-parent = darts.svg.node!.parent-element
 	attach-resize-listener darts-parent
 	darts-parent.add-event-listener \resize, !->
 		darts.resize!
+		darts.reaxis!
 		darts.redraw!
 
 /*------------------
@@ -152,6 +220,7 @@ let @ = score
 	@x-axis = @g .append \g .classed \x-axis, true
 	@y-axis = @g .append \g .classed \y-axis, true
 	@path   = @g .append \path .classed \line, true
+raise \score, score
 
 /*------------------
 Frequency response handling
@@ -210,6 +279,7 @@ P/Z list change handling
 recalc-cascade = !->
 	darts
 		..recalc!
+		..reaxis!
 		..redraw!
 	score
 		..recalc!
@@ -292,22 +362,24 @@ let textarea = options.query-selector "textarea[name='export']"
 				(concat-map Complex.pair)
 				>> (map Complex.to-string)
 				>> (.join ', ')
-		textarea.value = "B = [#b]\nA = [#a]\nzeros = [#zeros]\npoles = [#poles]"
+		textarea.value =
+			"B = [#b]\nA = [#a]\nzeros = [#zeros]\npoles = [#poles]"
 
 let textarea = options.query-selector "textarea[name='import']"
 	textarea.add-event-listener \change, (event) !->
 		[poles, zeros] = [null, null]
 		try
-			[poles, zeros] =
-				[/poles?\s*=\s*\[(.*?)\]/mi, /zeros?\s*=\s*\[(.*?)\]/mi]
+			[poles, zeros] :=
+				[/poles?\s*=\s*\[(.*?)\]/mi,
+				/zeros?\s*=\s*\[(.*?)\]/mi]
 				|> map do
 					(.exec textarea.value)
 					>> (.1) >> (/ ',')
 					>> (filter (!= ''))
 					>> (map evaluate)
-			[config.poles, config.zeros] = [poles, zeros]
 		catch
 			return
+		[config.poles, config.zeros] = [poles, zeros]
 		sync-darts!
 		recalc-cascade!
 

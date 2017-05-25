@@ -26,11 +26,10 @@ export to-string = ([x, y]) ->
 	[a, b] = [(is-zero x), (is-zero y)]
 	switch
 	| a and b => '0'
-	| b => "#x"
-	| a => "#{y}i"
-	| otherwise => if y < 0
-		then "#{x}#{y}i"
-		else "#{x}+#{y}i"
+	| b => "#{x.to-exponential 5}"
+	| a => "#{y.to-exponential 5} i"
+	| y < 0 => "#{x.to-exponential 5} #{y.to-exponential 5} i"
+	| otherwise => "#{x.to-exponential 5} +#{y.to-exponential 5} i"
 
 export negate = ([x, y]) ->
 	[-x, -y]
@@ -51,6 +50,12 @@ export pair = ->
 	if is-real it
 		then [it]
 		else [it, conj it]
+
+export top = ->
+	switch
+	| is-zero it.1 => it
+	| it.1 > 0 => it
+	| otherwise => [it.0, -it.1]
 
 export polar = (x) ->
 	[(abs x), (angle x)]
