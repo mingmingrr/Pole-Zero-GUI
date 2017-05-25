@@ -157,7 +157,7 @@ darts.svg.on \contextmenu, !->
 /*-------------------
 Pole zero plot handling
 -------------------*/
-darts.resize = !->
+do darts.resize = !->
 	{width, height} = get-dimensions document.get-element-by-id \darts
 	darts.g .style \transform, "translate(#{width/2}px,#{height/2}px)"
 	darts.r .range [0, (Math.min width, height)/2]
@@ -194,7 +194,7 @@ data-translate = (data) ->
 	p = darts.line [data] .slice 1, -1 .split ','
 	"translate(#{p.0}px,#{p.1}px)"
 
-darts.reaxis = !->
+do darts.reaxis = !->
 	darts.r-axis .select-all \circle.scale
 		.attr \r, darts.r
 	darts.r-axis .select-all \text
@@ -205,7 +205,7 @@ darts.reaxis = !->
 		darts.t-axis .select-all \line
 			.attr \x2, radius
 
-darts.redraw = !->
+do darts.redraw = !->
 	darts.zeros .select-all \circle
 		.style \transform, data-translate
 	darts.poles .select-all \polygon
