@@ -88,6 +88,7 @@ let @ = darts
 	@zeros = @g .append \g .classed \zeros, true
 	@poles = @g .append \g .classed \poles, true
 	@cross = '0 2.8,3 5,5 3,2.8 0,5 -3,3 -5,0 -2.8,-3 -5,-5 -3,-2.8 0,-5 3,-3 5'
+let @ = darts
 	@z-drag = d3.drag!
 		.on \start, (data) !->
 			idx = closest-index-to data, config.zeros
@@ -108,7 +109,7 @@ let @ = darts
 		recalc-cascade!
 	@z-dblclick = (data) !->
 		d3.event.prevent-default!
-		z = trace config.zeros.splice do
+		z = config.zeros.splice do
 			closest-index-to data, config.zeros
 			1
 		config.poles.push z.0
@@ -134,13 +135,22 @@ let @ = darts
 		recalc-cascade!
 	@p-dblclick = (data) !->
 		d3.event.prevent-default!
-		z = config.poles.splice do
+		p = config.poles.splice do
 			closest-index-to data, config.poles
 			1
-		config.zeros.push z.0
+		config.zeros.push p.0
 		sync-darts!
 		recalc-cascade!
 raise \darts, darts
+
+darts.svg.on \contextmenu, !->
+	d3.event.prevent-default!
+	{width, height} = get-dimensions document.get-element-by-id \darts
+	{layer-x: x, layer-y: y} = d3.event
+	[x, y] = map darts.r.invert, [(x - width / 2 - 10), (y - height / 2 - 10)]
+	config.poles.push [x, y]
+	sync-darts!
+	recalc-cascade!
 
 /*-------------------
 Pole zero plot handling
