@@ -88,10 +88,7 @@ let @ = darts
 	@zeros = @g .append \g .classed \zeros, true
 	@poles = @g .append \g .classed \poles, true
 	@cross = '0 2.8,3 5,5 3,2.8 0,5 -3,3 -5,0 -2.8,-3 -5,-5 -3,-2.8 0,-5 3,-3 5'
-<<<<<<< HEAD
 let @ = darts
-=======
->>>>>>> 51b346ca97391dbecede9f0e4580d1abacc5fcc8
 	@z-drag = d3.drag!
 		.on \start, (data) !->
 			idx = closest-index-to data, config.zeros
@@ -110,7 +107,6 @@ let @ = darts
 			1
 		sync-darts!
 		recalc-cascade!
-<<<<<<< HEAD
 	@z-dblclick = (data) !->
 		d3.event.prevent-default!
 		z = config.zeros.splice do
@@ -119,10 +115,6 @@ let @ = darts
 		config.poles.push z.0
 		sync-darts!
 		recalc-cascade!
-=======
-	@z-dblclick = !->
-		...
->>>>>>> 51b346ca97391dbecede9f0e4580d1abacc5fcc8
 	@p-drag = d3.drag!
 		.on \start, (data) !->
 			idx = closest-index-to data, config.poles
@@ -131,16 +123,11 @@ let @ = darts
 		.on \drag, (data) !->
 			{x, y} = d3.event
 			[x, y] = map darts.r.invert, [x, y]
-<<<<<<< HEAD
 			config.poles[*-1] = [x, y]
-=======
-			config.zeros[*-1] = [x, y]
->>>>>>> 51b346ca97391dbecede9f0e4580d1abacc5fcc8
 			sync-darts!
 			recalc-cascade!
 	@p-context = (data) !->
 		d3.event.prevent-default!
-<<<<<<< HEAD
 		config.poles.splice do
 			closest-index-to data, config.poles
 			1
@@ -164,14 +151,6 @@ darts.svg.on \contextmenu, !->
 	config.poles.push [x, y]
 	sync-darts!
 	recalc-cascade!
-=======
-		config.zeros.splice do
-			closest-index-to data, config.zeros
-			1
-		sync-darts!
-		recalc-cascade!
-raise \darts, darts
->>>>>>> 51b346ca97391dbecede9f0e4580d1abacc5fcc8
 
 /*-------------------
 Pole zero plot handling
@@ -200,20 +179,14 @@ do darts.recalc = !->
 		.enter! .append \circle
 			.call darts.z-drag
 			.on \contextmenu, darts.z-context
-<<<<<<< HEAD
 			.on \dblclick, darts.z-dblclick
-=======
->>>>>>> 51b346ca97391dbecede9f0e4580d1abacc5fcc8
 	darts.poles .select-all \g
 		.data map Complex.polar, do
 			concat-map Complex.pair, config.poles
 		.enter! .append \polygon .attr \points, darts.cross
 			.call darts.p-drag
 			.on \contextmenu, darts.p-context
-<<<<<<< HEAD
 			.on \dblclick, darts.p-dblclick
-=======
->>>>>>> 51b346ca97391dbecede9f0e4580d1abacc5fcc8
 
 data-translate = (data) ->
 	p = darts.line [data] .slice 1, -1 .split ','
