@@ -15,7 +15,7 @@ validate = (value) ->
 create-input = (item, init=null) ->
 	input = document.create-element \input
 	input.value = init if init?
-	input.type = \type
+	input.type = \text
 	removed = false
 	listener = (event) !->
 		event.stop-propagation!
@@ -37,7 +37,8 @@ create-input = (item, init=null) ->
 				input.remove!
 				item.text-content = value
 				unless (item.next-element-sibling)?
-					container.append-child create-item!
+					container.append-child (new-item = create-item!)
+					new-item.query-selector \input .focus!
 	input.add-event-listener \click, (!-> it.stop-propagation!)
 	input.add-event-listener \change, (!-> it.stop-propagation!)
 	input.add-event-listener \blur, listener
