@@ -50,7 +50,7 @@ $(packobj): compile config
 
 $(jsobj) $(testobj) $(confobj): %.js: %.ls
 	lsc -pcb $< > $@
-	echo -e '  \033[1;30mcompiled\033[0m $<'
+	@echo -e '  \033[1;30mcompiled\033[0m $<'
 
 $(cssobj): %.css: %.styl
 	stylus $<
