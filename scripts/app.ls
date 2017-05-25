@@ -102,6 +102,7 @@ let @ = darts
 			recalc-cascade!
 	@z-context = (data) !->
 		d3.event.prevent-default!
+		d3.event.stop-propagation!
 		config.zeros.splice do
 			closest-index-to data, config.zeros
 			1
@@ -128,6 +129,7 @@ let @ = darts
 			recalc-cascade!
 	@p-context = (data) !->
 		d3.event.prevent-default!
+		d3.event.stop-propagation!
 		config.poles.splice do
 			closest-index-to data, config.poles
 			1
