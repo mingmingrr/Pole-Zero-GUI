@@ -115,7 +115,7 @@ darts.svg.on \contextmenu, !->
 	{width, height} = get-dimensions document.get-element-by-id \darts
 	{layer-x: x, layer-y: y} = d3.event
 	[x, y] = map darts.r.invert, [(x - width / 2 - 10), (y - height / 2 - 10)]
-	config.poles.push [x, y]
+	config.zeros.push [x, y]
 	sync-darts!
 	recalc-cascade!
 
