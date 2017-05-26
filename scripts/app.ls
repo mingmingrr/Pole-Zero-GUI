@@ -89,58 +89,28 @@ let @ = darts
 	@poles = @g .append \g .classed \poles, true
 	@cross = '0 2.8,3 5,5 3,2.8 0,5 -3,3 -5,0 -2.8,-3 -5,-5 -3,-2.8 0,-5 3,-3 5'
 let @ = darts
-	@z-drag = d3.drag!
+	@drag = (type) ->
+		d3.drag!
 		.on \start, (data) !->
-			idx = closest-index-to data, config.zeros
-			[config.zeros[*-1], config.zeros[idx]] =
-				[config.zeros[idx], config.zeros[*-1]]
+			idx = closest-index-to data, config[type]
+			[config.[type].0, config[type][idx]] =
+				[config[type][idx], config[type].0]
 		.on \drag, (data) !->
 			{x, y} = d3.event
-			[x, y] = map darts.r.invert, [x, y]
-			config.zeros[*-1] = [x, y]
+			config.[type].0 =
+				map darts.r.invert, [x, y]
 			sync-darts!
 			recalc-cascade!
-	@z-context = (data) !->
+	@click = (type, flip=false) -> (data) !->
 		d3.event.prevent-default!
 		d3.event.stop-propagation!
-		config.zeros.splice do
-			closest-index-to data, config.zeros
+		popped = config[type].splice do
+			closest-index-to data, config[type]
 			1
-		sync-darts!
-		recalc-cascade!
-	@z-dblclick = (data) !->
-		d3.event.prevent-default!
-		z = config.zeros.splice do
-			closest-index-to data, config.zeros
-			1
-		config.poles.push z.0
-		sync-darts!
-		recalc-cascade!
-	@p-drag = d3.drag!
-		.on \start, (data) !->
-			idx = closest-index-to data, config.poles
-			[config.poles[*-1], config.poles[idx]] =
-				[config.poles[idx], config.poles[*-1]]
-		.on \drag, (data) !->
-			{x, y} = d3.event
-			[x, y] = map darts.r.invert, [x, y]
-			config.poles[*-1] = [x, y]
-			sync-darts!
-			recalc-cascade!
-	@p-context = (data) !->
-		d3.event.prevent-default!
-		d3.event.stop-propagation!
-		config.poles.splice do
-			closest-index-to data, config.poles
-			1
-		sync-darts!
-		recalc-cascade!
-	@p-dblclick = (data) !->
-		d3.event.prevent-default!
-		p = config.poles.splice do
-			closest-index-to data, config.poles
-			1
-		config.zeros.push p.0
+		if flip
+			if type == \poles
+				then config.zeros.push popped.0
+				else config.poles.push popped.0
 		sync-darts!
 		recalc-cascade!
 raise \darts, darts
@@ -173,22 +143,19 @@ do darts.rescale = !->
 	darts.r-axis .append \text .classed \unit, true .data [1]
 
 do darts.recalc = !->
-	darts.zeros .select-all \circle .remove!
-	darts.poles .select-all \polygon .remove!
-	darts.zeros .select-all \g
+	marks =
+		zeros : [\circle, id]
+		poles : [\polygon, (.attr \points, darts.cross)]
+	for type, shape of marks
+		darts[type] .select-all shape.0 .remove!
+		darts[type] .select-all \g
 		.data map Complex.polar, do
-			concat-map Complex.pair, config.zeros
-		.enter! .append \circle
-			.call darts.z-drag
-			.on \contextmenu, darts.z-context
-			.on \dblclick, darts.z-dblclick
-	darts.poles .select-all \g
-		.data map Complex.polar, do
-			concat-map Complex.pair, config.poles
-		.enter! .append \polygon .attr \points, darts.cross
-			.call darts.p-drag
-			.on \contextmenu, darts.p-context
-			.on \dblclick, darts.p-dblclick
+			concat-map Complex.pair, config[type]
+		.enter! .append shape.0
+		|> shape.1 |> ->
+			it.call darts.drag type
+			.on \contextmenu, darts.click type, false
+			.on \dblclick, darts.click type, true
 
 data-translate = (data) ->
 	p = darts.line [data] .slice 1, -1 .split ','
