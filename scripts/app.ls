@@ -18,12 +18,14 @@ raise \d3, d3
 document.query-selector-all \.list-input
 |> each (element) !->
 	element.validate = (value) ->
+		return if value == ''
 		try
 			result = evaluate value
 			return
 				value  : value
 				result : result
 		catch
+			alert e
 			return null
 
 config =
@@ -359,6 +361,7 @@ let textarea = options.query-selector "textarea[name='import']"
 					>> (filter (!= ''))
 					>> (map evaluate)
 		catch
+			alert e
 			return
 		[config.poles, config.zeros] = [poles, zeros]
 		sync-darts!
