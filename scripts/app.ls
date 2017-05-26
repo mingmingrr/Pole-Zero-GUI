@@ -37,22 +37,14 @@ config =
 	resolution : 256
 
 sync-darts = ->
-	[poles, zeros] = <[poles zeros]>
-	|> map (-> document.query-selector ('#'+"#it .list-input"))
-	[poles, zeros]
-	|> map ->
-			it.query-selector-all ':scope > li'
-			|> map (-> it.remove!)
-	config.poles ++ [null]
-		|> map ->
-			if it?
-				then poles.create-item (Complex.to-string it)
-				else poles.create-item!
-	config.zeros ++ [null]
-		|> map ->
-			if it?
-				then zeros.create-item (Complex.to-string it)
-				else zeros.create-item!
+	<[poles zeros]>
+	|> map (type) ->
+		list = document.query-selector ('#'+type+' .list-input')
+		list.query-selector-all ':scope > li'
+		|> map (.remove!)
+		config[type]
+		|> map (-> list.create-item Complex.to-string it)
+		list.create-item!
 
 get-dimensions = (node) ->
 	style = window.get-computed-style node
@@ -221,12 +213,11 @@ do score.resize = !->
 	score.x-axis .style \transform, "translateY(#{height}px)"
 
 do score.recalc = !->
-	poly-fft = (concat-map Complex.pair)
-		>> (Numeric.to-polynomial)
-		>> (fft config.resolution)
-		>> (-> take (it.length / 2 + 1), it)
 	score.data = [config.zeros, config.poles]
-		|> map poly-fft
+		|> map (concat-map Complex.pair)
+			>> (Numeric.to-polynomial)
+			>> (fft config.resolution)
+			>> (-> take (it.length / 2 + 1), it)
 		|> apply (zip-with Complex.div)
 		|> map (Complex.abs >> (* config.gain))
 		|> enumerate
