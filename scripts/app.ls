@@ -15,7 +15,8 @@ require! './onresize.js': {attach-resize-listener}
 
 raise \d3, d3
 
-(flip each) (document.query-selector-all \.list-input), (element) !->
+document.query-selector-all \.list-input
+|> each (element) !->
 	element.validate = (value) ->
 		try
 			result = evaluate value
@@ -320,7 +321,8 @@ let input = options.query-selector "input[name='frequency']"
 		config.frequency := parse-float input.value
 		rescale-cascade!
 
-(flip each) (options.query-selector-all "input[name='axis']"), (input) !->
+options.query-selector-all "input[name='axis']"
+|> each (input) !->
 	input.add-event-listener \click, (event) !->
 		config.scale := input.value
 		rescale-cascade!
