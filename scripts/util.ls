@@ -1,14 +1,27 @@
-require! 'prelude-ls': {zip, zip-with, zip-all, drop, apply}
+require! 'prelude-ls': {zip, zip-with, zip-all, drop, apply, and-list, find-index}
 
-require! './util.js': {trace}
+export trace = ->
+	console.log ...
+	return &[*-1]
+
+export find-edit = (eq, a, b) -->
+	idx = find-index ((apply eq) >> (!)), zip a, b
+	return undefined unless idx?
+	mode = switch a.length - b.length
+	| 1  => \deletion
+	| 0  => \substitution
+	| -1 => \insertion
+	| _  => null
+	return null unless mode?
+	diff = (Math.min a.length, b.length) - idx -
+		1 + (Math.abs (a.length - b.length))
+	return null unless and-list zip-with eq,
+		a[-diff til], b[-diff til]
+	return [idx, mode]
 
 export raise = (key, value=eval(key), log=false) !->
 	window[key] = value
 	console.log value if log
-
-export trace = ->
-	console.log it
-	return it
 
 export list = ->
 	&[til]
