@@ -1,3 +1,5 @@
+require! 'prelude-ls': {map}
+
 require! './numeric.js': {is-zero}
 
 export Complex = (a, b = 0) ->
@@ -22,14 +24,22 @@ export imag = (.1)
 
 export is-real = imag >> is-zero
 
-export to-string = ([x, y]) ->
-	[a, b] = [(is-zero x), (is-zero y)]
+export to-string = ([x, y], prec=5) ->
+	[a, b] = map is-zero, [x, y]
+	[x, y] = map do
+		(num) ->
+			str = num.to-string!
+			switch
+			| 'e' in str => num.to-exponential prec
+			| '.' in str => num.to-fixed prec
+			| otherwise  => str
+		[x, y]
 	switch
 	| a and b => '0'
-	| b => "#{x.to-exponential 5}"
-	| a => "#{y.to-exponential 5} i"
-	| y < 0 => "#{x.to-exponential 5} #{y.to-exponential 5} i"
-	| otherwise => "#{x.to-exponential 5} +#{y.to-exponential 5} i"
+	| b => "#{x}"
+	| a => "#{y} i"
+	| y < 0 => "#{x} #{y} i"
+	| otherwise => "#{x} +#{y} i"
 
 export negate = ([x, y]) ->
 	[-x, -y]
