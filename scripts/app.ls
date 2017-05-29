@@ -1,32 +1,19 @@
 require! d3
-require! 'prelude-ls': {minimum-by, partition, sort-by, flatten, signum, compact, id, flip, each, negate, map, zip-with, concat-map, apply, take, unchars, split, is-it-NaN, filter, any, elem-index, minimum}
+require! 'prelude-ls' : {minimum-by, partition, sort-by, flatten, signum, compact, id, flip, each, negate, map, zip-with, concat-map, apply, take, unchars, split, is-it-NaN, filter, any, elem-index, minimum}
 
-require! './complex.js': Complex
-require! './numeric.js': Numeric
-require! './fft.js': {fft}
-require! './evaluate.js': {evaluate}
-require! './util.js': {enumerate, trace, raise}
+require! './complex.js' : Complex
+require! './numeric.js' : Numeric
+require! './fft.js' : {fft}
+require! './evaluate.js' : {evaluate}
+require! './util.js' : {enumerate, trace, raise}
 
 require! './draggable.js'
 require! './scalable.js'
 require! './slide-container.js'
-require! './list-input.js'
-require! './onresize.js': {attach-resize-listener}
+require! './list-input.js' : ListInput
+require! './onresize.js' : {attach-resize-listener}
 
 raise \d3, d3
-
-document.query-selector-all \.list-input
-|> each (element) !->
-	element.validate = (value) ->
-		return if value == ''
-		try
-			result = evaluate value
-			return
-				value  : value
-				result : result
-		catch
-			alert e
-			return null
 
 config =
 	poles      : []
@@ -36,15 +23,28 @@ config =
 	gain       : 1
 	resolution : 256
 
-sync-darts = ->
-	<[poles zeros]>
-	|> map (type) ->
-		list = document.query-selector ('#'+type+' .list-input')
+list-inputs =
+	poles : document.query-selector '#poles .list-input'
+	zeros : document.query-selector '#zeros .list-input'
+
+for let _, list of list-inputs
+	ListInput.attach-validator list, (value) ->
+		return if value == ''
+		try
+			result = evaluate value
+			return
+				value   : result
+				content : value
+		catch
+			return null
+
+sync-darts = !->
+	for let type, list of list-inputs
 		list.query-selector-all ':scope > li'
 		|> map (.remove!)
 		config[type]
-		|> map (-> list.create-item Complex.to-string it)
-		list.create-item!
+		|> map (!-> ListInput.append-item list, Complex.to-string it)
+		ListInput.append-item list
 
 get-dimensions = (node) ->
 	style = window.get-computed-style node
@@ -271,17 +271,10 @@ rescale-cascade = !->
 		..redraw!
 		..replot!
 
-let target = document.query-selector '#poles .list-input'
-	target.add-event-listener \change, (event) !->
-		config.poles = target.get-elements-by-tag-name \li
-			|> map (JSON.parse . (.get-attribute \value))
-			|> compact
-		recalc-cascade!
-
-let target = document.query-selector '#zeros .list-input'
-	target.add-event-listener \change, (event) !->
-		config.zeros = target.get-elements-by-tag-name \li
-			|> map (JSON.parse . (.get-attribute \value))
+for let type, list of list-inputs
+	list.add-event-listener \change, (event) !->
+		config[type] := list.get-elements-by-tag-name \li
+			|> map (JSON.parse << (.get-attribute \value))
 			|> compact
 		recalc-cascade!
 
