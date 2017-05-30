@@ -74,20 +74,20 @@ Pole zero plot config
 darts =
 	svg : d3 .select \svg#darts
 	r   : d3 .scale-linear! .domain [0, 1.2]
-let @ = darts
-	@g  = @svg .append \g
-	@line = d3 .radial-line! .radius ((.0) >> @r)
+<<<<
+	g  : darts.svg .append \g
+	line : d3 .radial-line! .radius ((.0) >> darts.r)
 		.angle ((.1) >> negate >> (+ (Math.PI / 2)))
-let @ = darts
-	@r-axis = @g .append \g .classed \r-axis, true
-	@t-axis = @g .append \g .classed \t-axis, true
+<<<<
+	r-axis : darts.g .append \g .classed \r-axis, true
+	t-axis : (darts.g .append \g .classed \t-axis, true
 		..select-all \g .data d3.range 0, 360, 30 .enter!
-			.append \line .style \transform, (-> "rotate(#{it}deg)")
-	@zeros = @g .append \g .classed \zeros, true
-	@poles = @g .append \g .classed \poles, true
-	@cross = '0 2.8,3 5,5 3,2.8 0,5 -3,3 -5,0 -2.8,-3 -5,-5 -3,-2.8 0,-5 3,-3 5'
-let @ = darts
-	@drag = (type) ->
+			.append \line .style \transform, (-> "rotate(#{it}deg)"))
+	zeros : darts.g .append \g .classed \zeros, true
+	poles : darts.g .append \g .classed \poles, true
+	cross : '0 2.8,3 5,5 3,2.8 0,5 -3,3 -5,0 -2.8,-3 -5,-5 -3,-2.8 0,-5 3,-3 5'
+<<<<
+	drag : (type) ->
 		d3.drag!
 		.on \start, (data) !->
 			idx = closest-index-to data, config[type]
@@ -99,7 +99,7 @@ let @ = darts
 				map darts.r.invert, [x, y]
 			sync-darts!
 			recalc-cascade!
-	@click = (type, flip=false) -> (data) !->
+	click : (type, flip=false) -> (data) !->
 		d3.event.prevent-default!
 		d3.event.stop-propagation!
 		popped = config[type].splice do
@@ -190,12 +190,12 @@ score =
 	x   : d3 .scale-linear!
 	xi  : (* (2 * config.frequency / config.resolution))
 	y   : null
-let @ = score
-	@g  = @svg .append \g
-let @ = score
-	@x-axis = @g .append \g .classed \x-axis, true
-	@y-axis = @g .append \g .classed \y-axis, true
-	@path   = @g .append \path .classed \line, true
+<<<<
+	g : score.svg .append \g
+<<<<
+	x-axis : score.g .append \g .classed \x-axis, true
+	y-axis : score.g .append \g .classed \y-axis, true
+	path   : score.g .append \path .classed \line, true
 raise \score, score
 
 /*------------------
