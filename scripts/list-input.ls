@@ -46,6 +46,7 @@ export create-item = (init=null) ->
 		input = create-input item.text-content
 		item.text-content = ''
 		item.append-child input
+		input.focus!
 	return item
 
 export remove-item = (item) !->
@@ -60,8 +61,11 @@ export remove-item = (item) !->
 export append-item = (container, init=null) !->
 	container.append-child (item = create-item init)
 	if (input = item.query-selector ':scope > input')?
-		remove-input input, false
-		try
+		if (valid = validators[container] init)?
+			remove-input input, false
+			item.set-attribute \value, JSON.stringify valid.value
+			item.text-content = valid.content
+		else
 			input.focus!
 
 export attach-validator = (container, validator=null) !-->

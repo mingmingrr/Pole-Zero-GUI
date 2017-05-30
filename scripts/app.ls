@@ -42,9 +42,12 @@ sync-darts = !->
 	for let type, list of list-inputs
 		list.query-selector-all ':scope > li'
 		|> map (.remove!)
+		temp = config[type]
 		config[type]
-		|> map (!-> ListInput.append-item list, Complex.to-string it)
+		|> map Complex.to-string
+		|> each (!-> ListInput.append-item list, it)
 		ListInput.append-item list
+		config[type] = temp # wtf?!
 
 get-dimensions = (node) ->
 	style = window.get-computed-style node
@@ -152,10 +155,6 @@ do darts.recalc = !->
 			.on \contextmenu, darts.click type, false
 			.on \dblclick, darts.click type, true
 
-data-translate = (data) ->
-	p = darts.line [data] .slice 1, -1 .split ','
-	"translate(#{p.0}px,#{p.1}px)"
-
 do darts.reaxis = !->
 	darts.r-axis .select-all \circle.scale
 		.attr \r, darts.r
@@ -168,10 +167,13 @@ do darts.reaxis = !->
 			.attr \x2, radius
 
 do darts.redraw = !->
+	translate = (data) ->
+		p = darts.line [data] .slice 1, -1 .split ','
+		"translate(#{p.0}px,#{p.1}px)"
 	darts.zeros .select-all \circle
-		.style \transform, data-translate
+		.style \transform, translate
 	darts.poles .select-all \polygon
-		.style \transform, data-translate
+		.style \transform, translate
 
 let darts-parent = darts.svg.node!.parent-element
 	attach-resize-listener darts-parent
@@ -264,7 +266,6 @@ rescale-cascade = !->
 		..resize!
 		..recalc!
 	score
-		..rescale!
 		..rescale!
 		..resize!
 		..recalc!
