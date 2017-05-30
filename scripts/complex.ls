@@ -1,4 +1,4 @@
-require! 'prelude-ls': {map}
+require! 'prelude-ls': {map, elem-index}
 
 require! './numeric.js': {is-zero}
 
@@ -30,15 +30,18 @@ export to-string = ([x, y], prec=5) ->
 		(num) ->
 			str = num.to-string!
 			switch
-			| 'e' in str => num.to-exponential prec
-			| '.' in str => num.to-fixed prec
+			| 'e' in str =>
+				num.to-exponential prec
+			| '.' in str =>
+				num.to-fixed Math.min prec, do
+					str.length - 1 - (elem-index '.', str)
 			| otherwise  => str
 		[x, y]
 	switch
-	| a and b => '0'
-	| b => "#{x}"
-	| a => "#{y} i"
-	| y < 0 => "#{x} #{y} i"
+	| a and b   => '0'
+	| b         => "#{x}"
+	| a         => "#{y} i"
+	| y < 0     => "#{x} #{y} i"
 	| otherwise => "#{x} +#{y} i"
 
 export negate = ([x, y]) ->
@@ -49,6 +52,9 @@ export abs = ([x, y]) ->
 
 export abs2 = ([x, y]) ->
 	x^2 + y^2
+
+export close-to = (delta, a, b) -->
+	delta <= abs sub a, b
 
 export angle = ([x, y]) ->
 	Math.atan2 y, x
@@ -80,11 +86,15 @@ export sub = ([x1, y1], [x2, y2]) -->
 	[x1 - x2, y1 - y2]
 
 export mul = ([x1, y1], [x2, y2]) -->
-	[x1*x2 - y1*y2, x2*y1 + x1*y2]
+	return
+		x1 * x2 - y1 * y2
+		x2 * y1 + x1 * y2
 
 export div = ([x1, y1], [x2, y2]) -->
 	sq = x2^2 + y2^2
-	[(x1*x2 + y1*y2) / sq, (x2*y1 - x1*y2) / sq]
+	return
+		(x1 * x2 + y1 * y2) / sq
+		(x2 * y1 - x1 * y2) / sq
 
 export pow = ([x1, y1], [x2, y2]) -->
 	[z1, z2] = [(is-zero y1), (is-zero y2)]
@@ -93,10 +103,12 @@ export pow = ([x1, y1], [x2, y2]) -->
 	| z1 => rect [x1 ^ x2, y2 * Math.log x1]
 	| z2 => 
 		[r, t] = polar [x1, y1]
-		rect [r^x2, t*x2]
+		rect [r ^ x2, t * x2]
 	| _ =>
 		t = angle [x1, y1]
-		mul (pow [x1*x1 + y1*y1, 0], [x2/2, y2/2]), (pow e, [-y2*t, x2*t])
+		mul do
+			pow [x1 * x1 + y1 * y1, 0], [x2 / 2, y2 / 2]
+			pow e, [-y2 * t, x2 * t]
 
 export exp = pow e
 
