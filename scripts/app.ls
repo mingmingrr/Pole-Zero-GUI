@@ -1,5 +1,6 @@
 require! d3
-require! 'prelude-ls' : {minimum-by, partition, sort-by, flatten, signum, compact, id, flip, each, negate, map, zip-with, concat-map, apply, take, unchars, split, is-it-NaN, filter, any, elem-index, minimum}
+require! 'prelude-ls' : Prelude
+window <<<< Prelude
 
 require! './complex.js' : Complex
 require! './numeric.js' : Numeric
