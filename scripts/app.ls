@@ -6,7 +6,7 @@ require! './complex.js' : Complex
 require! './numeric.js' : Numeric
 require! './fft.js' : {fft}
 require! './evaluate.js' : {evaluate}
-require! './util.js' : {enumerate, trace, raise}
+require! './util.js' : {enumerate, trace, trace-json, raise, find-edit}
 
 require! './draggable.js'
 require! './scalable.js'
@@ -114,6 +114,9 @@ darts =
 		recalc-cascade!
 raise \darts, darts
 
+/*------------------
+Add a new zero with right click
+------------------*/
 darts.svg.on \contextmenu, !->
 	d3.event.prevent-default!
 	{width, height} = get-dimensions document.get-element-by-id \darts

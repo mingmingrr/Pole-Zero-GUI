@@ -54,7 +54,7 @@ export abs2 = ([x, y]) ->
 	x^2 + y^2
 
 export close-to = (delta, a, b) -->
-	delta <= abs sub a, b
+	delta * delta >= abs2 sub a, b
 
 export angle = ([x, y]) ->
 	Math.atan2 y, x

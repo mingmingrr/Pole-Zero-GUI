@@ -40,6 +40,10 @@ describe 'Index of edit with distance of 1', !->
 		expect Util.find-edit (==), [0, 1, 2, 3, 4], [0, 1, 2, 3, 4]
 			.to .be .undefined
 
+	specify 'Empty array', !->
+		expect Util.find-edit (==), [], [1]
+			.to .be .deep .equal [0, \insertion]
+
 	specify 'Equivalence function', !->
 		expect Util.find-edit (in), <[a b c d]>, <[ab ab cd cd]>
 			.to .be .undefined

@@ -41,7 +41,7 @@ release: all
 	cd $(releasedir); tar -zcvf ../release.tar.gz *
 
 .PHONY: watch
-watch: config
+watch: compile config
 	webpack --watch &
 	while true; do make --quiet compile; sleep 1; done
 
@@ -49,7 +49,7 @@ $(packobj): compile config
 	webpack
 
 $(jsobj) $(testobj) $(confobj): %.js: %.ls
-	lsc -pcb $< > $@
+	lsc --no-header -pcb $< > $@
 	@echo -e '  \033[1;30mcompiled\033[0m $<'
 
 $(cssobj): %.css: %.styl
