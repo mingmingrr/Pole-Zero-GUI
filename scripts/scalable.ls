@@ -25,10 +25,8 @@ corner.add-event-listener \mousedown, (event) !->
 		(.get-bounding-client-rect!)
 		[corner, element, element.parent-element]
 	[x-diff, y-diff] :=
-		(parse-int element-rect.left) - (parse-int parent-rect.left) - do
-			(parse-int corner-rect.width) - (parse-int event.layer-x)
-		(parse-int element-rect.top) - (parse-int parent-rect.top) - do
-			(parse-int corner-rect.height) - (parse-int event.layer-y)
+		(parse-int event.client-x) - (parse-int element-rect.width)
+		(parse-int event.client-y) - (parse-int element-rect.height)
 	[x-lim, y-lim] :=
 		(parse-int parent-rect.width) - (parse-int element-rect.left)
 		(parse-int parent-rect.height) - (parse-int element-rect.top)

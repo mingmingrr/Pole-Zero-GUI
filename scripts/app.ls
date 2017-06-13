@@ -295,7 +295,7 @@ let input = options.query-selector "input[name='resolution']"
 		value = input.value |> parse-int
 		round = value |> Math.log2 |> Math.round
 		diff = round |> (2 ^) |> (value -)
-		input.value = round |> (+ (signum diff)) |> (2 ^)
+		input.value = Math.min 4096, (round |> (+ (signum diff)) |> (2 ^))
 		config.resolution := input.value
 		recalc-cascade!
 	input.add-event-listener \change, listener
