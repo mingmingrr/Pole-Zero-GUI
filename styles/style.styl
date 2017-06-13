@@ -107,11 +107,17 @@ plot-dimensions(width, height, top, right, bottom, left)
 	plot-dimensions(100%, 100%, 20px, 20px, 30px, 50px)
 
 	path.line
-		fill   : none
 		stroke : steelblue
 		stroke-linejoin : round
 		stroke-linecap  : butt
 		stroke-width    : 1.5
+
+	.x-axis
+	.y-axis
+		.tick
+			line
+				stroke : gray
+				stroke-opacity : 0.5
 
 #darts
 	plot-dimensions(100%, 100%, 10px, 10px, 10px, 10px)

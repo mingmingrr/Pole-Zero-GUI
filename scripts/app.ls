@@ -233,11 +233,12 @@ do score.recalc = !->
 			|> filter (-> it.1 > 1e-5)
 
 do score.redraw = !->
+	{width, height} = get-dimensions score.svg.node!
 	[min, max] = d3.extent score.data, (.1)
 	min := 0 unless config.scale == \logarithmic
 	score.y .domain [min, max]
-	score.x-axis .call d3.axis-bottom score.x
-	score.y-axis .call d3.axis-left score.y
+	score.x-axis .call <| d3.axis-bottom score.x .tick-size-inner (-height)
+	score.y-axis .call <| d3.axis-left score.y   .tick-size-inner (-width)
 
 do score.replot = !->
 	score.path .datum score.data .attr \d, do
