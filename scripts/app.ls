@@ -328,6 +328,7 @@ let textarea = options.query-selector "textarea[name='export']"
 			|> map do
 				(concat-map Complex.pair)
 				>> Numeric.to-polynomial
+				>> reverse
 				>> (map Complex.to-string)
 				>> (.join ', ')
 		[poles, zeros] = [config.poles, config.zeros]
