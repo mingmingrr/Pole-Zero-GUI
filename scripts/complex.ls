@@ -40,9 +40,9 @@ export to-string = ([x, y], prec=5) ->
 	switch
 	| a and b   => '0'
 	| b         => "#{x}"
-	| a         => "#{y} i"
-	| y < 0     => "#{x} #{y} i"
-	| otherwise => "#{x} +#{y} i"
+	| a         => "#{y}i"
+	| y < 0     => "#{x}#{y}i"
+	| otherwise => "#{x}+#{y}i"
 
 export negate = ([x, y]) ->
 	[-x, -y]

@@ -82,15 +82,15 @@ describe 'Transformations', !->
 
 		specify 'Complex only', !->
 			expect Complex.to-string [0, 2]
-				.to .equal '2 i'
+				.to .equal \2i
 
 		specify 'Positive positive', !->
 			expect Complex.to-string [2, 2]
-				.to .equal '2 +2 i'
+				.to .equal \2+2i
 
 		specify 'Positive negative', !->
 			expect Complex.to-string [2, -2]
-				.to .equal '2 -2 i'
+				.to .equal \2-2i
 
 		specify 'Negative zero', !->
 			expect Complex.to-string [-2, 0]
