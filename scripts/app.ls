@@ -333,8 +333,8 @@ let textarea = options.query-selector "textarea[name='export']"
 				>> (.join ', ')
 		[poles, zeros] = [config.poles, config.zeros]
 			|> map do
-				(concat-map Complex.pair)
-				>> (map Complex.to-string)
+				# (concat-map Complex.pair) >>
+				(map Complex.to-string)
 				>> (.join ', ')
 		textarea.value =
 			"B = [#b]\nA = [#a]\nzeros = [#zeros]\npoles = [#poles]"
