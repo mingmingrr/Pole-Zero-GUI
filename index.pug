@@ -51,6 +51,9 @@ div.fill-horizontal.fill-vertical
 				fieldset
 					legend Import
 					textarea(name='import' rows=2 placeholder='zeros = []\npoles = []')
+					label
+						input(type='checkbox' name='dedupe' checked)
+						span Dedupe
 				fieldset
 					legend Export
 					textarea(name='export' rows=4

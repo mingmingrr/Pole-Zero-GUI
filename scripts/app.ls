@@ -336,24 +336,75 @@ let textarea = options.query-selector "textarea[name='export']"
 				>> (.join ', ')
 		[poles, zeros] = [config.poles, config.zeros]
 			|> map do
-				# (concat-map Complex.pair) >>
-				(map Complex.to-string)
+				(concat-map Complex.pair)
+				>> (map Complex.to-string)
 				>> (.join ', ')
 		textarea.value =
 			"B = [#b]\nA = [#a]\nzeros = [#zeros]\npoles = [#poles]"
+
+stable-sort-by = (func, array) -->
+	return array if array.length < 2
+	merge = (stack, [i, j], [left, right]) -->
+		switch
+		| not (i < left.length) => stack ++ right[j til]
+		| not (j < right.length) => stack ++ left[i til]
+		| (func left[i]) < (func right[j]) =>
+			stack.push left[i]
+			merge stack, [i + 1, j], [left, right]
+		| otherwise =>
+			stack.push right[j]
+			merge stack, [i, j + 1], [left, right]
+	array
+		|> split-at floor (array.length / 2)
+		|> map stable-sort-by func
+		|> merge [], [0, 0]
+
+dedupe-darts = (darts) ->
+	close-to = (a, b) --> 1e-6 < Math.abs (a - b)
+	complex-close-to = Complex.close-to 1e-6
+	[real, complex] = partition Complex.is-real, darts
+	dedupe = (stack, [i, j], [above, below]) -->
+		switch
+		| not (i < above.length) => stack ++ below[j til]
+		| not (j < below.length) => stack ++ above[i til]
+		| above[i] `complex-close-to` below[j] =>
+			stack.push above[i]
+			dedupe stack, [i + 1, j + 1], [above, below]
+		| (Complex.real above[i]) `close-to` (Complex.real below[j]) =>
+			switch
+			| Complex.imag above[i] < Complex.imag below[j] =>
+				stack.push above[i]
+				dedupe stack, [i + 1, j], [above, below]
+			| otherwise =>
+				stack.push below[j]
+				dedupe stack, [i, j + 1], [above, below]
+		| Complex.real above[i] < Complex.real below[j] =>
+			stack.push above[i]
+			dedupe stack, [i + 1, j], [above, below]
+		| otherwise =>
+			stack.push below[j]
+			dedupe stack, [i, j + 1], [above, below]
+	[above, below] = complex
+		|> partition (Complex.imag >> (> 0))
+		|> map ((sort-by Complex.imag) >> (stable-sort-by Complex.real))
+	[above, (map Complex.conj, below)]
+		|> dedupe [], [0, 0]
+		|> (++ real)
 
 let textarea = options.query-selector "textarea[name='import']"
 	textarea.add-event-listener \change, (event) !->
 		[poles, zeros] = [null, null]
 		try
 			[poles, zeros] :=
-				[/poles?\s*=\s*\[(.*?)\]/mi,
-				/zeros?\s*=\s*\[(.*?)\]/mi]
+				[/poles?\s*=\s*\[\s*(.*?)\s*\]/mi,
+				/zeros?\s*=\s*\[\s*(.*?)\s*\]/mi]
 				|> map do
 					(.exec textarea.value)
 					>> (.1) >> (/ ',')
 					>> (filter (!= ''))
 					>> (map evaluate)
+			if options.query-selector "input[name='dedupe']" .checked
+				[poles, zeros] = map dedupe-darts, [poles, zeros]
 		catch
 			alert e
 			return
