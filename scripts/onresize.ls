@@ -2,16 +2,6 @@ require! 'prelude-ls': {map, filter}
 
 create-object = (element) ->
 	document.create-element \object
-		..style
-			..position = \absolute
-			..display  = \block
-			..top      = 0
-			..left     = 0
-			..height   = \100%
-			..width    = \100%
-			..overflow = \hidden
-			..z-index  = -1
-			..pointer-events = \none
 		..type = \text/html
 		..data = \about:blank
 		..class-list

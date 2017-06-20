@@ -6,6 +6,17 @@ color2 = #aaa
 color3 = #666
 color4 = #000
 
+object.resize-trigger
+	position : absolute
+	display  : block
+	top      : 0
+	left     : 0
+	height   : 100%
+	width    : 100%
+	overflow : hidden
+	z-index  : -1
+	pointer-events : none
+
 .clickable
 	cursor : pointer
 
@@ -72,6 +83,10 @@ body
 	height   : 100vh
 	margin   : 0
 	overflow : hidden
+	font-size   : 10pt
+	font-family : sans-serif
+	text-anchor : middle
+
 
 .draggable
 	user-select : none
@@ -95,19 +110,12 @@ body
 		cursor   : se-resize
 		user-select : none
 
-plot-dimensions(width, height, top, right, bottom, left)
-	padding-top    : top
-	padding-right  : right
-	padding-bottom : bottom
-	padding-left   : left
-	width  : 'calc(%s - %s - %s)' % (width  left right )
-	height : 'calc(%s - %s - %s)' % (height top  bottom)
-
 #score
-	plot-dimensions(100%, 100%, 20px, 20px, 30px, 50px)
+	width  : 100%
+	height : 100%
 
 	path.line
-		fill : none
+		fill   : none
 		stroke : steelblue
 		stroke-linejoin : round
 		stroke-linecap  : butt
@@ -121,7 +129,8 @@ plot-dimensions(width, height, top, right, bottom, left)
 				stroke-opacity : 0.5
 
 #darts
-	plot-dimensions(100%, 100%, 10px, 10px, 10px, 10px)
+	width  : 100%
+	height : 100%
 	overflow : hidden
 
 	.r-axis
@@ -155,7 +164,6 @@ plot-dimensions(width, height, top, right, bottom, left)
 
 	.zeros
 		circle
-			r      : 5px
 			fill   : limegreen
 			cursor : move
 		circle:active

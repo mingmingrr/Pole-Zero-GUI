@@ -73,6 +73,12 @@ closest-index-to = (num, list) -->
 Pole zero plot config
 -------------------*/
 darts =
+	dim :
+		t : 10
+		r : 10
+		b : 10
+		l : 10
+<<<<
 	svg : d3 .select \svg#darts
 	r   : d3 .scale-linear! .domain [0, 1.2]
 <<<<
@@ -95,7 +101,10 @@ darts =
 			[config.[type].0, config[type][idx]] =
 				[config[type][idx], config[type].0]
 		.on \drag, (data) !->
+			{width, height} = get-dimensions darts.svg.node!
 			{x, y} = d3.event
+			unless /Chrome/.test navigator.user-agent
+				[x, y] = zip-with (-), [x, y], map (/ 2), [width, height]
 			config.[type].0 =
 				map darts.r.invert, [x, y]
 			sync-darts!
@@ -119,9 +128,10 @@ Add a new zero with right click
 ------------------*/
 darts.svg.on \contextmenu, !->
 	d3.event.prevent-default!
-	{width, height} = get-dimensions document.get-element-by-id \darts
+	{t, r, b, l} = darts.dim
+	{width, height} = get-dimensions darts.svg.node!
 	{layer-x: x, layer-y: y} = d3.event
-	[x, y] = map darts.r.invert, [(x - width / 2 - 10), (y - height / 2 - 10)]
+	[x, y] = map darts.r.invert, zip-with (-), [x, y], map (/ 2), [width, height]
 	config.zeros.push [x, y]
 	sync-darts!
 	recalc-cascade!
@@ -130,8 +140,11 @@ darts.svg.on \contextmenu, !->
 Pole zero plot handling
 -------------------*/
 do darts.resize = !->
-	{width, height} = get-dimensions document.get-element-by-id \darts
-	darts.g .style \transform, "translate(#{width/2}px,#{height/2}px)"
+	{t, r, b, l} = darts.dim
+	{width, height} = get-dimensions darts.svg.node!
+	[width, height] = [width - l - r, height - t - b]
+	darts.g .style \transform,
+		"translate(#{width/2 + l}px,#{height/2 + t}px)"
 	darts.r .range [0, (Math.min width, height)/2]
 
 do darts.rescale = !->
@@ -146,7 +159,7 @@ do darts.rescale = !->
 
 do darts.recalc = !->
 	marks =
-		zeros : [\circle, id]
+		zeros : [\circle, (.attr \r, 5)]
 		poles : [\polygon, (.attr \points, darts.cross)]
 	for type, shape of marks
 		darts[type] .select-all shape.0 .remove!
@@ -190,6 +203,12 @@ let darts-parent = darts.svg.node!.parent-element
 Frequency response config
 ------------------*/
 score =
+	dim :
+		t : 20
+		r : 20
+		b : 30
+		l : 50
+<<<<
 	svg : d3 .select \svg#score
 	x   : d3 .scale-linear!
 	xi  : (* (2 * config.frequency / config.resolution))
@@ -213,7 +232,10 @@ do score.rescale = !->
 	score.y = scales[config.scale]!
 
 do score.resize = !->
+	{t, r, b, l} = score.dim
 	{width, height} = get-dimensions score.svg.node!
+	[width, height] = [width - l - r, height - t - b]
+	score.g .style \transform, "translate(#{l}px,#{t}px)"
 	score.x .range [0, width]
 	score.y .range [height, 0]
 	score.x-axis .style \transform, "translateY(#{height}px)"
@@ -233,7 +255,9 @@ do score.recalc = !->
 			|> filter (-> it.1 > 1e-5)
 
 do score.redraw = !->
+	{t, r, b, l} = score.dim
 	{width, height} = get-dimensions score.svg.node!
+	[width, height] = [width - l - r, height - t - b]
 	[min, max] = d3.extent score.data, (.1)
 	min := 0 unless config.scale == \logarithmic
 	score.y .domain [min, max]
