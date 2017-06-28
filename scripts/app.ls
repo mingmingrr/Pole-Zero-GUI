@@ -259,7 +259,12 @@ do score.redraw = !->
 	{width, height} = get-dimensions score.svg.node!
 	[width, height] = [width - l - r, height - t - b]
 	[min, max] = d3.extent score.data, (.1)
-	min := 0 unless config.scale == \logarithmic
+	switch config.scale
+	| \logarithmic =>
+		max := max |> Math.log10 |> Math.ceil |> (10 **)
+		min := min |> Math.log10 |> Math.floor |> (10 **)
+	| \linear => min := 0
+	| otherwise => throw new Exception "unexpected scale: #{config.scale}"
 	score.y .domain [min, max]
 	score.x-axis .call <| d3.axis-bottom score.x .tick-size-inner (-height)
 	score.y-axis .call <| d3.axis-left score.y   .tick-size-inner (-width)
