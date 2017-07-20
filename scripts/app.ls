@@ -227,7 +227,7 @@ Frequency response handling
 do score.rescale = !->
 	scales =
 		linear      : -> d3.scale-linear!
-		logarithmic : -> d3.scale-log!.base 10
+		logarithmic : -> d3.scale-log! .base 10
 	score.x .domain [0, config.frequency]
 	score.y = scales[config.scale]!
 
@@ -259,13 +259,8 @@ do score.redraw = !->
 	{width, height} = get-dimensions score.svg.node!
 	[width, height] = [width - l - r, height - t - b]
 	[min, max] = d3.extent score.data, (.1)
-	switch config.scale
-	| \logarithmic =>
-		max := max |> Math.log10 |> Math.ceil |> (10 **)
-		min := min |> Math.log10 |> Math.floor |> (10 **)
-	| \linear => min := 0
-	| otherwise => throw new Exception "unexpected scale: #{config.scale}"
-	score.y .domain [min, max]
+	min = 0 if config.scale == \linear
+	score.y .domain [min, max] .nice!
 	score.x-axis .call <| d3.axis-bottom score.x .tick-size-inner (-height)
 	score.y-axis .call <| d3.axis-left score.y   .tick-size-inner (-width)
 
