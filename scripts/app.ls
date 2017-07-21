@@ -211,7 +211,6 @@ score =
 <<<<
 	svg : d3 .select \svg#score
 	x   : d3 .scale-linear!
-	xi  : (* (2 * config.frequency / config.resolution))
 	y   : null
 <<<<
 	g : score.svg .append \g
@@ -227,6 +226,7 @@ Frequency response handling
 do score.rescale = !->
 	scales =
 		linear      : -> d3.scale-linear!
+		decibel     : -> d3.scale-linear!
 		logarithmic : -> d3.scale-log! .base 10
 	score.x .domain [0, config.frequency]
 	score.y = scales[config.scale]!
@@ -250,9 +250,17 @@ do score.recalc = !->
 		|> map (Complex.abs >> (* config.gain))
 		|> enumerate
 		|> filter (-> it.1? and not is-it-NaN it.1)
-	if config.scale == \logarithmic
+	switch config.scale
+	| \logarithmic =>
 		score.data = score.data
 			|> filter (-> it.1 > 1e-5)
+	| \decibel =>
+		score.data = score.data
+			|> trace-json
+			|> filter (-> it.1 > 1e-5)
+			|> trace-json
+			|> map (-> [it.0, 20 * Math.log10 it.1])
+			|> trace-json
 
 do score.redraw = !->
 	{t, r, b, l} = score.dim
@@ -267,7 +275,7 @@ do score.redraw = !->
 do score.replot = !->
 	score.path .datum score.data .attr \d, do
 		d3 .line!
-			.x ((.0) >> score.xi >> score.x)
+			.x ((.0) >> (* (2 * config.frequency / config.resolution)) >> score.x)
 			.y ((.1) >> score.y)
 
 let score-parent = score.svg.node!.parent-element
