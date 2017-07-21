@@ -3,9 +3,9 @@ require! chai: {expect}
 require! 'chai-deep-closeto': deep_closeto
 chai.use deep_closeto
 
-require! '../scripts/evaluate.js': Evaluate
-require! '../scripts/token.js': Token
-require! '../scripts/util.js': {list, trace}
+require! '../../scripts/eval/evaluate.js': Evaluate
+require! '../../scripts/eval/token.js': Token
+require! '../../scripts/util.js': {list, trace}
 
 describe 'Reverse Polish evaluation', !->
 	d = 1e-6

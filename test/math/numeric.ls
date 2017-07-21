@@ -5,8 +5,8 @@ chai.use deep_closeto
 
 require! 'prelude-ls': {map, last}
 
-require! '../scripts/complex.js': Complex
-require! '../scripts/numeric.js': Numeric
+require! '../../scripts/math/complex.js': Complex
+require! '../../scripts/math/numeric.js': Numeric
 
 <-! describe 'Polynomial Transformations'
 r = [1, 3, -2]

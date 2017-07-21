@@ -3,8 +3,8 @@ require! chai: {expect}
 require! 'chai-deep-closeto': deep_closeto
 chai.use deep_closeto
 
-require! '../scripts/complex.js': Complex
-require! '../scripts/fft.js': Fft
+require! '../../scripts/math/complex.js': Complex
+require! '../../scripts/math/fft.js': Fft
 
 <-! describe 'Fast fourier transform'
 a = [[3, 2], [-1, 0], [-2, 1]]

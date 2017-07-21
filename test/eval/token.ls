@@ -3,7 +3,7 @@ require! chai: {expect}
 require! 'chai-deep-closeto': deep_closeto
 chai.use deep_closeto
 
-require! '../scripts/token.js': Token
+require! '../../scripts/eval/token.js': Token
 
 <-! describe 'Tokens'
 

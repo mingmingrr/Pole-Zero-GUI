@@ -60,7 +60,7 @@ $(htmlobj): %.html: %.pug
 
 .PHONY: test
 test: compile $(testobj)
-	mocha
+	mocha --recursive
 
 .PHONY: clean
 clean:

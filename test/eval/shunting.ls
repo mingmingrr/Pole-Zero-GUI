@@ -3,9 +3,9 @@ require! chai: {expect}
 require! 'chai-deep-closeto': deep_closeto
 chai.use deep_closeto
 
-require! '../scripts/shunting.js': Shunting
-require! '../scripts/token.js': Token
-require! '../scripts/util.js': {list, trace}
+require! '../../scripts/eval/shunting.js': Shunting
+require! '../../scripts/eval/token.js': Token
+require! '../../scripts/util.js': {list, trace}
 
 <-! describe 'Shunting yard'
 

@@ -3,7 +3,7 @@ require! chai: {expect}
 require! 'chai-deep-closeto': deep_closeto
 chai.use deep_closeto
 
-require! '../scripts/complex.js': Complex
+require! '../../scripts/math/complex.js': Complex
 
 <-! describe 'Complex numbers'
 a = [-3, 4]
