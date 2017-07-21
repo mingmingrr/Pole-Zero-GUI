@@ -3,7 +3,7 @@ require! 'prelude-ls': {apply, reverse}
 require! './token.js': Token
 require! './tokenize.js': {tokenize}
 require! './shunting.js': {shunting}
-require! './util.js': Util
+require! '../util.js': Util
 
 pop-stack = (stack) -> ->
 	unless stack.length

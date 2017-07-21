@@ -1,7 +1,7 @@
 require! 'prelude-ls': {reverse, any}
 
-require! './util.js': {trace, list, enumerate, peek}
 require! './token.js': Token
+require! '../util.js': {trace, list, enumerate, peek}
 
 export multiply = (a, b) -->
 	unless a?

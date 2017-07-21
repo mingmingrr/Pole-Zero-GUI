@@ -2,17 +2,19 @@ require! d3
 require! 'prelude-ls' : Prelude
 window <<<< Prelude
 
-require! './complex.js' : Complex
-require! './numeric.js' : Numeric
-require! './fft.js' : {fft}
-require! './evaluate.js' : {evaluate}
+require! './math/complex.js' : Complex
+require! './math/numeric.js' : Numeric
+require! './math/fft.js' : {fft}
+
+require! './eval/evaluate.js' : {evaluate}
+
 require! './util.js' : {enumerate, trace, trace-json, raise, find-edit}
 
-require! './draggable.js'
-require! './scalable.js'
-require! './slide-container.js'
-require! './list-input.js' : ListInput
-require! './onresize.js' : {attach-resize-listener}
+require! './ui/draggable.js'
+require! './ui/scalable.js'
+require! './ui/slide-container.js'
+require! './ui/list-input.js' : ListInput
+require! './ui/onresize.js' : {attach-resize-listener}
 
 raise \d3, d3
 
@@ -256,11 +258,8 @@ do score.recalc = !->
 			|> filter (-> it.1 > 1e-5)
 	| \decibel =>
 		score.data = score.data
-			|> trace-json
 			|> filter (-> it.1 > 1e-5)
-			|> trace-json
 			|> map (-> [it.0, 20 * Math.log10 it.1])
-			|> trace-json
 
 do score.redraw = !->
 	{t, r, b, l} = score.dim

@@ -1,6 +1,6 @@
 require! 'prelude-ls': {flip, each, id, flatten}
 
-require! './util.js': {list, trace}
+require! '../util.js': {list, trace}
 
 validators = {}
 validators[null] = validators[undefined] = validators[void] =

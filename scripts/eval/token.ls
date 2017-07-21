@@ -1,7 +1,7 @@
 require! 'prelude-ls': {map, concat-map, pairs-to-obj, obj-to-pairs, apply}
 
-require! './complex.js': Complex
-require! './util.js': {trace}
+require! '../math/complex.js': Complex
+require! '../util.js': {trace}
 
 export class Token
 

@@ -1,7 +1,7 @@
 require! 'prelude-ls': {compact}
 
 require! './token.js': Token
-require! './util.js': {list, trace}
+require! '../util.js': {list, trace}
 
 regex =
 	space:
